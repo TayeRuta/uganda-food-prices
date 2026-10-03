@@ -182,6 +182,17 @@ cov.unstack('commodity')['count']
 **Check:** each core market has 95–200 monthly observations per staple, mostly from April 2011 to late 2025. Jinja has the most gaps (about 45% of months missing), Kapchorwa about 25%; the rest are over 85% complete. The consumer price index runs to March 2026, so later prices are dropped when converting to real terms.
 """),
 
+('code', r"""
+# Recording errors: prices more than double or under half the market's centred 7-month median
+flagged = P.load_prices(clean=False)
+flagged = flagged[flagged['outlier'] & flagged['commodity'].isin(P.STAPLES)
+                  & flagged['market'].isin(list(CORE_MARKETS) + KARAMOJA_MARKETS)]
+print(f'Removed {len(flagged)} of {len(raw[raw["commodity"].isin(P.STAPLES) & raw["market"].isin(list(CORE_MARKETS) + KARAMOJA_MARKETS)]) + len(flagged):,} staple prices as likely recording errors')
+flagged[['date', 'market', 'commodity', 'pricetype', 'price']]
+"""),
+('md', r"""
+**Cleaning:** a handful of prices are clearly mis-recorded; the clearest is Gulu maize in June 2021, entered as 2 shillings a kilo against a normal 1,000–2,000. Removing these matters: that single value alone distorted Gulu's seasonal pattern by 25 points. The rule may occasionally remove a genuine spike (Karita sorghum in April 2022 falls in the food crisis), so all removals are listed above.
+"""),
 ('md', '---\n## 1. The seasonal price cycle'),
 ('code', r"""
 rows = {}
@@ -217,7 +228,7 @@ axes[0].legend(loc='upper left', fontsize=8.5)
 plt.tight_layout(); plt.show()
 """),
 ('md', r"""
-**Finding:** real maize prices follow a strong annual cycle: cheapest at harvest (October–February) and dearest in the lean months before the first harvest (May–July). The swing from cheapest to dearest month averages about **30%** across markets (20–44%). Beans follow a similar pattern with a May peak.
+**Finding:** real maize prices follow a strong annual cycle: cheapest at harvest (October–February) and dearest in the lean months before the first harvest (May–July). The swing from cheapest to dearest month averages about **30%** across markets (20–43%). Beans follow a similar pattern with a May peak.
 
 The cycle is far larger in **Karamoja for sorghum**, its staple: 28–44% there, against 8–23% elsewhere. Lean-season sorghum in Karamoja (June–August) is the costliest food of the year exactly when household stocks are lowest.
 
@@ -236,12 +247,13 @@ for com, pan in panels.items():
                 r = fit(q, x, ctrl)
                 rows.append({'commodity': com, 'season': s, 'rainfall': x, 'controls': ' + '.join(ctrl), **r})
 rain_res = pd.DataFrame(rows)
-rain_res.pivot_table(index=['commodity', 'season', 'rainfall'], columns='controls', values=['pct', 'p']).round(3)
+rain_res['dry_pct'] = 100 * (np.exp(-rain_res['coef']) - 1)   # effect of a season one SD DRIER than normal
+rain_res.pivot_table(index=['commodity', 'season', 'rainfall'], columns='controls', values=['dry_pct', 'p']).round(3)
 """),
 ('md', r"""
-**Reading the table:** `pct` is the change in real prices over the following months when the season's rainfall is one standard deviation **above** normal. A negative value means wetter seasons bring lower prices, or equivalently that a dry season raises them by about the same amount.
+**Reading the table:** `dry_pct` is the change in real prices over the following months when the season's rainfall is one standard deviation **below** normal (roughly a 1-in-6 dry season). Positive values mean dry seasons raise prices.
 
-**Finding:** after the **first season**, maize prices respond clearly: a season one standard deviation drier than normal raises real maize prices by about **8%** in September–December (p = 0.002–0.008), with maize flour moving about 5%. After the **second season**, sorghum responds most (about 8%, p ≤ 0.009) and maize somewhat (about 7%, p ≈ 0.09). Controlling for the exchange rate changes nothing. **Beans do not respond** in either season, plausibly because beans are traded more widely across East Africa and are grown in both seasons in most areas, so one poor season is buffered.
+**Finding:** after the **first season**, maize prices respond clearly: a season one standard deviation drier than normal raises real maize prices by about **8–9%** in September–December (p = 0.002–0.010), with maize flour moving about 5%. After the **second season**, sorghum responds most (about 8–9%, p ≤ 0.009) and maize somewhat (about 7%, p ≈ 0.09–0.10). Controlling for the exchange rate changes nothing. **Beans do not respond** in either season, plausibly because beans are traded more widely across East Africa and are grown in both seasons in most areas, so one poor season is buffered.
 
 Regional and national rainfall give almost identical answers: Uganda's markets are well connected, so a national shortfall moves prices everywhere.
 """),
@@ -266,6 +278,9 @@ for com, s, x in checks:
                  'yearly_pct': 100 * (np.exp(obs.params['x']) - 1), 'permutation_p': pp, 'years': n,
                  'leave_one_year_out_min': min(loo), 'leave_one_year_out_max': max(loo)})
 robust = pd.DataFrame(rows)
+dry = lambda pct: 100 * (1 / (1 + pct / 100) - 1)   # convert a wetter-season effect to a drier-season one
+for c in ['panel_pct', 'yearly_pct', 'leave_one_year_out_min', 'leave_one_year_out_max']:
+    robust['dry_' + c] = dry(robust[c])
 robust.round(3)
 """),
 ('code', r"""
@@ -283,12 +298,14 @@ for s, x in [('A', 'rain_national'), ('A', 'rain_regional'), ('B', 'rain_nationa
     obs, pp, n = permutation_p(q, x)
     rows.append({'season': s, 'rainfall': x, 'years': f"{q['year'].min()}–{q['year'].max()}", 'panel_pct': base['pct'],
                  'clustered_p': base['p'], 'yearly_pct': 100 * (np.exp(obs.params['x']) - 1), 'permutation_p': pp})
-pd.DataFrame(rows).round(3)
+wholesale_res = pd.DataFrame(rows)
+wholesale_res['dry_panel_pct'] = 100 * (1 / (1 + wholesale_res['panel_pct'] / 100) - 1)
+wholesale_res.round(3)
 """),
 ('md', r"""
 **Finding:** the size and direction of each effect are very stable. No single year drives them (every leave-one-year-out estimate keeps the same sign and a similar size), and collapsing the markets to one national price per year gives the same estimates. The **certainty is lower than the clustered p-values suggest**, though. With only 15–16 years, a permutation test, which compares the result against thousands of reshuffled rainfall histories, gives p ≈ 0.08–0.18 for the retail results. The seven markets move together, so they add little independent information beyond the number of years.
 
-The **first-season maize result replicates** in an independent sample: WFP's wholesale maize prices for 2006–2021, which include the 2008–09 drought, show a 10% rise per standard deviation of drier March–May rain (permutation p = 0.03–0.05). The second-season maize result does not replicate in the wholesale data.
+The **first-season maize result replicates** in an independent sample: WFP's wholesale maize prices for 2006–2021, which include the 2008–09 drought, show an 11% rise per standard deviation of drier March–May rain (permutation p = 0.03–0.04). The second-season maize result does not replicate in the wholesale data.
 
 **Confidence:** *medium* for the first-season maize effect (two datasets, consistent size, permutation p ≈ 0.03–0.08); *suggestive* for the second-season sorghum and maize effects (one dataset).
 """),
@@ -323,9 +340,9 @@ ax.set_title('A positive IOD in July–August is followed by cheaper maize the n
 plt.tight_layout(); plt.show()
 """),
 ('md', r"""
-**Finding:** the July–August IOD, known by early September, points to next year's lean-season prices. Each +1 °C of the July–August IOD is followed by real maize prices about **24% lower** the following February–May, and sorghum about 20% lower. Strong positive IOD seasons reach about +0.4 to +0.7 °C, so the practical range is about 10–17%. This fits the rainfall analysis: a positive IOD brings a wetter October–December season, hence a bigger harvest.
+**Finding:** the July–August IOD, known by early September, points to next year's lean-season prices. Each +1 °C of the July–August IOD is followed by real maize prices about **24% lower** the following February–May, and sorghum about 19% lower. Strong positive IOD seasons reach about +0.4 to +0.7 °C, so the practical range is about 10–17%. This fits the rainfall analysis: a positive IOD brings a wetter October–December season, hence a bigger harvest.
 
-**Caution:** this rests on 16 years of retail prices. The permutation p-value is 0.04 for maize and 0.06–0.09 for sorghum and maize flour, and the effect does **not** replicate in the 2006–2021 wholesale maize data. Treat it as a promising early-warning indicator to monitor, not an established forecast. Beans show no IOD effect.
+**Caution:** this rests on 16 years of retail prices. The permutation p-value is 0.02 for maize and 0.08–0.09 for sorghum and maize flour, and the effect does **not** replicate in the 2006–2021 wholesale maize data. Treat it as a promising early-warning indicator to monitor, not an established forecast. Beans show no IOD effect.
 """),
 
 ('md', '---\n## 4. Karamoja'),
@@ -380,7 +397,7 @@ plt.tight_layout(); plt.subplots_adjust(bottom=0.24); plt.show()
 kar_rain.loc[2018:2025].round(2)
 """),
 ('md', r"""
-**Finding:** Karamoja's **maize and sorghum markets are as connected to the rest of the country as the other markets are to each other.** After removing trends and seasonal patterns, Karamoja's maize prices move with the core markets about as closely (correlation 0.63) as the core markets move with one another (0.63); for sorghum the link is, if anything, stronger. Only **beans** are noticeably less connected (0.36 against 0.66).
+**Finding:** Karamoja's **maize and sorghum markets are nearly as connected to the rest of the country as the other markets are to each other.** After removing trends and seasonal patterns, Karamoja's maize prices move with the core markets nearly as closely (correlation 0.67) as the core markets move with one another (0.72); for sorghum the link is, if anything, stronger (0.39 against 0.28). Only **beans** are noticeably less connected (0.36 against 0.66).
 
 The price *levels* show Karamoja's position in the grain trade: maize there costs about 20% less than in Kampala but about 22% **more** than in Lira, the nearby surplus-producing area, consistent with a deficit region buying in grain and paying the transport cost.
 
@@ -400,8 +417,9 @@ prof.round(2).to_csv(out / 'seasonal_price_profiles.csv')
 rain_res.round(4).to_csv(out / 'rainfall_price_effects.csv', index=False)
 robust.round(4).to_csv(out / 'rainfall_price_robustness.csv', index=False)
 iod_res.round(4).to_csv(out / 'iod_price_effects.csv', index=False)
-integration.round(4).to_csv(out / 'karamoja_market_integration.csv', index=False)
-print('Saved 5 tables to data/processed/')
+integration.round(4).to_csv(out / 'karamoja_market_integration.csv')
+wholesale_res.round(4).to_csv(out / 'wholesale_replication.csv', index=False)
+print('Saved 6 tables to data/processed/')
 """),
 ('md', r"""
 ---
@@ -409,8 +427,8 @@ print('Saved 5 tables to data/processed/')
 
 **What the prices show**
 - **The seasonal cycle is the biggest, most predictable price risk.** Real maize prices swing about 30% between harvest and the lean season every year; sorghum in Karamoja swings up to 44%.
-- **A dry first season raises maize prices** by about 8–10% per standard deviation of rainfall shortfall, in both retail (2011–2025) and wholesale (2006–2021) data. *Medium confidence.*
-- **A dry second season raises sorghum prices** by about 8%. *Suggestive; one dataset.*
+- **A dry first season raises maize prices** by about 9–11% per standard deviation of rainfall shortfall, in both retail (2011–2025) and wholesale (2006–2021) data. *Medium confidence.*
+- **A dry second season raises sorghum prices** by about 8–9%. *Suggestive; one dataset.*
 - **A positive July–August IOD is followed by cheaper maize and sorghum** the next February–May. *Suggestive; not replicated in wholesale data.*
 - **Beans don't respond** to Ugandan rainfall.
 - **Karamoja's maize and sorghum prices move with the national market**, but its staple's seasonal swing is the largest in the country, and real prices ran over 40% above normal in the 2022 crisis.

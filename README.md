@@ -2,16 +2,18 @@
 
 How Uganda's rainy seasons, and the Indian Ocean conditions that drive them, show up in the prices of maize, sorghum and beans. The project links WFP market prices (2006–2026) to regional rainfall from the companion [Uganda rainfall analysis](https://github.com/TayeRuta/uganda-rainfall-analysis). It also audits whether FAOSTAT's national crop statistics can support this kind of analysis.
 
+**Read the report: [Rainfall shocks and food prices in Uganda](https://tayeruta.github.io/uganda-food-prices/reports/food_prices_report.html)**
+
 ## Key findings
 
 **Prices**
 
-- **The seasonal cycle is the largest and most predictable price risk.** Real maize prices swing about 30% (20–44%) between harvest (October–February) and the lean season (May–July) every year. In Karamoja, sorghum, the staple, swings by up to 44%. Storing grain from harvest to the lean season earns about 25–30% in real terms on average, before storage losses.
-- **A dry first season raises maize prices.** A March–May season one standard deviation drier than normal raises real maize prices by about 8–10% in September–December. The effect appears in both retail (2011–2025) and wholesale (2006–2021) data. *Medium confidence* (permutation p ≈ 0.03–0.08).
-- **A dry second season raises sorghum prices** by about 8% the following February–May. *Suggestive* (one dataset).
-- **The July–August Indian Ocean Dipole points to next year's lean-season prices.** Each +1 °C is followed by real maize prices about 24% lower the next February–May (about 10–17% in a strong positive-IOD year). *Suggestive*: permutation p = 0.04, and not replicated in the wholesale data.
+- **The seasonal cycle is the largest and most predictable price risk.** Real maize prices swing about 30% (20–43%) between harvest (October–February) and the lean season (May–July) every year. In Karamoja, sorghum, the staple, swings by up to 44%. Storing grain from harvest to the lean season earns about 25–30% in real terms on average, before storage losses.
+- **A dry first season raises maize prices.** A March–May season one standard deviation drier than normal raises real maize prices by about 9–11% in September–December. The effect appears in both retail (2011–2025) and wholesale (2006–2021) data. *Medium confidence* (permutation p ≈ 0.03–0.08).
+- **A dry second season raises sorghum prices** by about 8–9% the following February–May. *Suggestive* (one dataset).
+- **The July–August Indian Ocean Dipole points to next year's lean-season prices.** Each +1 °C is followed by real maize prices about 24% lower the next February–May (about 10–17% in a strong positive-IOD year). *Suggestive*: permutation p = 0.02, but not replicated in the wholesale data.
 - **Beans don't respond** to Ugandan rainfall in either season.
-- **Karamoja's maize and sorghum prices move with the national market**, as closely as other markets do. What sets Karamoja apart is the size of its seasonal swings and crisis spikes: real prices nearly doubled in mid-2022.
+- **Karamoja's maize and sorghum prices move with the national market**, nearly as closely as other markets do. What sets Karamoja apart is the size of its seasonal swings and crisis spikes: real prices nearly doubled in mid-2022.
 
 **Data quality**
 
@@ -29,18 +31,22 @@ How Uganda's rainy seasons, and the Indian Ocean conditions that drive them, sho
 │   ├── raw/                   # downloaded inputs (see Data sources)
 │   ├── external/              # rainfall and climate indices from the rainfall project
 │   └── processed/             # result tables written by the notebooks
+├── reports/
+│   └── food_prices_report.html        # the write-up, published on GitHub Pages
 ├── notebooks/
 │   ├── 01_faostat_data_quality.ipynb      # can national crop statistics detect weather shocks?
 │   └── 02_rainfall_and_food_prices.ipynb  # seasonal cycles, rainfall shocks, IOD, Karamoja
 ├── scripts/
 │   ├── fetch_data.py          # downloads every input dataset
 │   ├── prices.py              # shared loading and modelling code
-│   └── build_notebooks.py     # generates the notebooks from source
+│   ├── build_notebooks.py     # generates the notebooks from source
+│   └── build_report_data.py   # injects the notebook's results into the report
 └── requirements.txt
 ```
 
 ## Methods
 
+- **Cleaning:** 10 of 6,783 staple prices removed as recording errors (more than double or under half the local 7-month median); all are listed in notebook 02.
 - **Real prices:** WFP retail prices deflated by Uganda's general consumer price index, logged, with each market's linear trend and calendar-month pattern removed.
 - **Season design:**
   - First season: March–May rains, with prices measured in September–December.
@@ -61,6 +67,7 @@ pip install -r requirements.txt
 python scripts/fetch_data.py            # or: --rainfall-repo /path/to/uganda-rainfall-analysis
 python scripts/build_notebooks.py
 jupyter nbconvert --to notebook --execute --inplace notebooks/*.ipynb
+python scripts/build_report_data.py     # refresh the numbers in the report
 ```
 
 ## Data sources

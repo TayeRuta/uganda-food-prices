@@ -36,12 +36,26 @@ SEASONS = {
 
 
 # ---------------------------------------------------------------- loaders
-def load_prices():
+OUTLIER_LOG_RATIO = np.log(2)   # drop prices more than double or less than half the local median
+
+
+def flag_outliers(d):
+    """Flag recording errors: prices more than 2x or below 0.5x the centred 7-month rolling
+    median of the same market, commodity, price type and unit."""
+    d = d.sort_values('date').copy()
+    keys = ['market', 'commodity', 'pricetype', 'unit']
+    med = d.groupby(keys)['price'].transform(lambda s: s.rolling(7, center=True, min_periods=3).median())
+    d['outlier'] = (np.log(d['price'] / med)).abs() > OUTLIER_LOG_RATIO
+    return d
+
+
+def load_prices(clean=True):
     d = pd.read_csv(RAW / 'wfp_food_prices_uga.csv', skiprows=[1])
     d['date'] = pd.to_datetime(d['date']).dt.to_period('M')
     d['price'] = pd.to_numeric(d['price'], errors='coerce')
     d['usdprice'] = pd.to_numeric(d['usdprice'], errors='coerce')
-    return d.dropna(subset=['price'])
+    d = flag_outliers(d.dropna(subset=['price']))
+    return d[~d['outlier']] if clean else d
 
 
 def load_cpi(kind='General'):

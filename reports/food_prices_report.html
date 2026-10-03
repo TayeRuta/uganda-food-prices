@@ -1,0 +1,617 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Uganda Food Prices and Rainfall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single 1080px report column — masthead, KPI strip, then numbered findings, each = headline + chart panel + takeaway */
+:root{
+  --bg:#f3f5f1; --panel:#ffffff; --ink:#132019; --ink-2:#4b5a51; --muted:#7a877f; --rule:#dfe4dd; --grid:#eceee9;
+  --accent:#16825a; --wet:#2b6c9e; --wet-deep:#1b4a70; --dry:#c4572e; --dry-deep:#8d3416; --neutral:#ecebe6;
+  --mam:#16825a; --son:#8a63d2; --band:#eef3ec; --chip:#e8eee6;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Public Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1411; --panel:#161d19; --ink:#eaf0eb; --ink-2:#b2beb6; --muted:#859189; --rule:#27302b; --grid:#1f2723;
+  --accent:#3fae82; --wet:#4a8cc4; --wet-deep:#8cc0ec; --dry:#d9693f; --dry-deep:#f0a283; --neutral:#2a302c;
+  --mam:#2e9e74; --son:#9277e6; --band:#1a241f; --chip:#1d2622; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1411; --panel:#161d19; --ink:#eaf0eb; --ink-2:#b2beb6; --muted:#859189; --rule:#27302b; --grid:#1f2723;
+  --accent:#3fae82; --wet:#4a8cc4; --wet-deep:#8cc0ec; --dry:#d9693f; --dry-deep:#f0a283; --neutral:#2a302c;
+  --mam:#2e9e74; --son:#9277e6; --band:#1a241f; --chip:#1d2622; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:20px;padding-block:0 64px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+p{margin:0}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* masthead */
+.mast{padding-block:48px 28px;display:grid;gap:18px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:flex;gap:14px;flex-wrap:wrap}
+.eyebrow span+span{color:var(--muted)}
+.mast h1{font-size:clamp(36px,6.2vw,68px);line-height:1.02;font-weight:800;max-width:15ch}
+.mast h1 em{font-style:normal;color:var(--accent)}
+.dek{font-size:clamp(17px,2vw,20px);color:var(--ink-2);max-width:62ch;line-height:1.5}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-block:28px 8px;border-top:2px solid var(--ink)}
+.kpi{padding:18px 18px 4px 0;display:grid;gap:6px;align-content:start}
+.kpi+.kpi{padding-left:18px;border-left:1px solid var(--rule)}
+.kpi .v{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,3.6vw,42px);line-height:1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:.45em;font-weight:500;color:var(--ink-2);margin-left:3px}
+.kpi .l{font-size:14px;color:var(--ink-2);line-height:1.4}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--chip);color:var(--ink-2);max-width:100%;white-space:normal;line-height:1.3}
+.tag i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.tag.dry i{background:var(--dry)} .tag.wet i{background:var(--wet)}
+
+/* summary */
+.summary{margin-block:36px 12px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px}
+.summary h2{font-size:14px;font-family:var(--f-mono);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+.summary ol{margin:0;padding:0;list-style:none;display:grid;gap:14px;counter-reset:k}
+.summary li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;font-size:17px;line-height:1.5}
+.summary li::before{counter-increment:k;content:counter(k);font-family:var(--f-mono);font-size:13px;color:var(--accent);padding-top:3px}
+.summary b{font-weight:600}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-block:28px 8px}
+nav.toc a{font-size:13px;color:var(--ink-2);text-decoration:none;padding:6px 12px;border:1px solid var(--rule);border-radius:99px;background:var(--panel)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--accent);color:var(--ink);outline:none}
+
+/* sections */
+section.f{padding-block:56px 8px;display:grid;gap:18px;scroll-margin-top:16px}
+.f-head{display:grid;gap:10px;max-width:760px}
+.f-num{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.f-head h2{font-size:clamp(24px,3.2vw,34px);line-height:1.15;font-weight:700}
+.f-head p{color:var(--ink-2);font-size:16.5px;max-width:66ch}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px 20px 14px;min-width:0}
+.panel-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px 24px;flex-wrap:wrap;margin-bottom:6px}
+.panel-title{font-weight:600;font-size:15px}
+.panel-sub{font-size:13px;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.sw.line{height:3px;border-radius:2px;width:18px}
+.sw.dash{height:0;border-top:2px dashed var(--ink-2);width:18px;border-radius:0}
+.chart{width:100%;position:relative}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.note{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;font-size:15px;color:var(--ink-2);max-width:760px;padding:14px 16px;border-radius:10px;background:var(--band)}
+.note b{color:var(--ink);font-weight:600}
+.note .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);padding-top:3px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+
+/* svg text */
+svg{display:block;overflow:visible}
+svg text{font-family:var(--f-body);fill:var(--muted);font-size:11.5px}
+svg .tick text{font-family:var(--f-mono);font-size:11px}
+svg .tick line{stroke:var(--grid)}
+svg .domain{display:none}
+svg .ann,svg .ann-strong{paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+svg .ann{fill:var(--ink-2);font-size:12px;font-weight:500}
+svg .ann-strong{fill:var(--ink);font-size:12.5px;font-weight:600}
+svg .lab{font-weight:600;font-size:12.5px}
+
+/* table */
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--rule)}
+th{font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+td.r,th.r{text-align:right}
+tr.hi td{font-weight:600}
+.sev{display:inline-block;height:8px;border-radius:4px;background:var(--dry);vertical-align:middle}
+
+/* limits */
+.limits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.limits h3{font-size:18px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.limits ul{margin:0;padding-left:18px;display:grid;gap:8px;color:var(--ink-2);font-size:15px}
+.next{border-left:3px solid var(--accent);padding:4px 0 4px 18px;max-width:760px;font-size:17px}
+.next b{font-family:var(--f-display)}
+
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:600;font-size:15px;padding:10px 0}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted);display:grid;gap:8px;max-width:820px}
+
+/* tooltip */
+#tip{position:fixed;pointer-events:none;z-index:20;background:var(--ink);color:var(--bg);padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.45;min-width:120px;box-shadow:0 6px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .12s}
+#tip .t{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+#tip .row{display:flex;justify-content:space-between;gap:16px}
+#tip .row b{font-family:var(--f-mono);font-weight:500}
+#tip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+
+@media (max-width:820px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi:nth-child(3){padding-left:0;border-left:0}
+  .kpi:nth-child(n+3){border-top:1px solid var(--rule);margin-top:6px}
+  .summary{grid-template-columns:1fr;gap:12px}
+  .grid2,.limits{grid-template-columns:1fr}
+}
+@media (max-width:480px){ body{padding-inline:16px} .panel{padding:16px 12px 10px} }
+@media (prefers-reduced-motion:reduce){#tip{transition:none}}
+/* regional additions */
+.score{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.score th{white-space:nowrap}
+.score td{padding:12px 8px;vertical-align:middle}
+.score th{padding-inline:8px}
+.score td.reg{font-weight:600;white-space:nowrap}
+.score td.reg small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.score tr.ref td{background:var(--band)}
+.bar-cell{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.score td .num{white-space:nowrap}
+.bar-cell i{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--wet);opacity:.85}
+.bar-cell i.var{background:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.pill.sig{background:var(--accent);color:var(--panel)}
+.pill.ns{background:var(--chip);color:var(--ink-2)}
+.pill.border{background:transparent;color:var(--ink-2);border:1px dashed var(--muted)}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.mini .panel{padding:14px 14px 8px}
+.mini .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mini .ph b{font-size:14px}
+.callout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.callout .panel{display:grid;gap:6px;align-content:start}
+.callout .big{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.1}
+.callout p{font-size:14.5px;color:var(--ink-2)}
+@media (max-width:820px){.callout{grid-template-columns:1fr}}
+.mapnote{font-size:13px;color:var(--muted)}
+</style>
+<div id="tip" role="status" aria-live="polite"></div>
+<style>
+:root{--a:#16825a;--b:#8a63d2;--kar:#c4572e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--a:#2e9e74;--b:#9277e6;--kar:#d9693f}}
+:root[data-theme="dark"]{--a:#2e9e74;--b:#9277e6;--kar:#d9693f}
+.conf{display:inline-flex;align-items:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.conf.high{background:var(--accent);color:var(--panel)}
+.conf.med{border:1.5px solid var(--accent);color:var(--ink)}
+.conf.low{background:var(--chip);color:var(--ink-2)}
+.kpi .conf{justify-self:start}
+.tabs{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--rule);border-radius:99px;background:var(--bg)}
+.tabs button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink-2);padding:5px 12px;border-radius:99px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.who{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.who .panel{display:grid;gap:10px;align-content:start}
+.who h3{font-size:19px}
+.who ul{margin:0;padding-left:18px;display:grid;gap:7px;font-size:15px;color:var(--ink-2)}
+.who ul b{color:var(--ink);font-weight:600}
+.conf-table td{vertical-align:top}
+.conf-table td:first-child{font-weight:600;min-width:220px}
+.conf-table td.ev{color:var(--ink-2);font-size:13.5px}
+@media (max-width:820px){.who{grid-template-columns:1fr}}
+@media (max-width:480px){.note{grid-template-columns:1fr;gap:4px}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow"><span>Agriculture brief · Food prices</span><span>Uganda, 2006–2026</span><span>WFP market data</span></div>
+  <h1>When the rains fail, <em>what happens to food prices?</em></h1>
+  <p class="dek">Twenty years of market prices for maize, sorghum and beans, set against Uganda's rainy seasons and the Indian Ocean conditions that drive them. The biggest price risk turns out to be the predictable yearly cycle between harvest and lean season. On top of it, a poor first season adds about 9–11% to maize prices, and the Indian Ocean in July–August hints at the following year's lean-season prices.</p>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="v num" id="k-swing">30<small>%</small></div><div class="l">Average swing in real maize prices between the cheapest and dearest month of the year</div><span class="conf high">High confidence</span></div>
+  <div class="kpi"><div class="v num" id="k-maize">+9<small>%</small></div><div class="l">Rise in maize prices after a March–May season one standard deviation drier than normal</div><span class="conf med">Medium confidence</span></div>
+  <div class="kpi"><div class="v num" id="k-kar">~2×</div><div class="l">Karamoja's real maize and sorghum prices at the mid-2022 peak, against their 2018–26 average</div><span class="conf high">High confidence</span></div>
+  <div class="kpi"><div class="v num">2008</div><div class="l">A change in method moved FAOSTAT's national crop figures by up to ±100% in one year</div><span class="conf high">High confidence</span></div>
+</div>
+
+<div class="summary">
+  <h2>Key takeaways</h2>
+  <ol>
+    <li><span><b>The yearly price cycle is the biggest, most predictable risk.</b> Maize is about 30% dearer in May–July than at harvest. Farmers who sell at harvest and buy back later lose much of that, which is the case for better storage. <span class="conf high">High</span></span></li>
+    <li><span><b>A dry first season raises maize prices.</b> About 9–11% per standard deviation of rainfall shortfall, in two independent price datasets. <span class="conf med">Medium</span></span></li>
+    <li><span><b>A dry second season raises sorghum prices</b> by about 8–9% the next February–May. <span class="conf low">Suggestive</span></span></li>
+    <li><span><b>The July–August Indian Ocean Dipole points to next year's lean-season prices</b>: a strong positive reading has been followed by maize about 10–17% cheaper. <span class="conf low">Suggestive</span></span></li>
+    <li><span><b>Karamoja moves with the national maize market but swings harder</b>, with the largest seasonal cycle in its staple and prices near double the norm in mid-2022. <span class="conf high">High</span></span></li>
+    <li><span><b>National crop statistics can't measure weather shocks.</b> FAOSTAT's Uganda series are dominated by method changes and projections. <span class="conf high">High</span></span></li>
+  </ol>
+</div>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#cycle">Price cycle</a><a href="#shocks">Rainfall shocks</a><a href="#trust">How sure</a><a href="#iod">Early warning</a><a href="#karamoja">Karamoja</a><a href="#faostat">Crop statistics</a><a href="#meaning">What it means</a><a href="#methods">Methods</a>
+</nav>
+
+<section class="f" id="cycle">
+  <div class="f-head">
+    <div class="f-num">01 · The price cycle</div>
+    <h2>Every year, food is cheapest at harvest and dearest before the next one</h2>
+    <p>Real price in each calendar month compared with the market's yearly average, after removing long-run trends. Thin lines are individual markets; thick lines average the core markets and the Karamoja markets.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-top">
+      <div><div class="panel-title" id="cyc-title">Real price by month, % vs yearly average</div><div class="panel-sub">Hover a month for the averages</div></div>
+      <div class="tabs" role="group" aria-label="Commodity"><button type="button" data-k="Maize (white)" aria-pressed="true">Maize</button><button type="button" data-k="Sorghum" aria-pressed="false">Sorghum</button><button type="button" data-k="Beans" aria-pressed="false">Beans</button></div>
+    </div>
+    <div class="legend" style="margin-bottom:6px"><span><i class="sw line" style="background:var(--wet)"></i>Core markets (Kampala, Lira, Gulu, Mbarara, Iganga, Kapchorwa, Jinja)</span><span><i class="sw line" style="background:var(--kar)"></i>Karamoja markets</span></div>
+    <div class="chart" id="c-cycle"></div>
+  </div>
+  <div class="callout" id="cycle-cards"></div>
+</section>
+
+<section class="f" id="shocks">
+  <div class="f-head">
+    <div class="f-num">02 · Rainfall shocks</div>
+    <h2>A dry first season shows up in maize prices</h2>
+    <p>Change in real prices over the months after harvest when the season's rainfall was one standard deviation <b>below</b> normal, roughly a 1-in-6 dry season. Lines show 95% confidence intervals; filled markers are significant at p &lt; 0.05 before the stricter checks in section 03.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-top">
+      <div><div class="panel-title">Effect of a dry season on real prices after harvest</div><div class="panel-sub">National rainfall · market fixed effects · world maize price held constant</div></div>
+      <div class="legend"><span><i class="sw" style="background:var(--a);border-radius:50%"></i>First season: Mar–May rains → Sep–Dec prices</span><span><i class="sw" style="background:var(--b);border-radius:50%"></i>Second season: Oct–Dec rains → next Feb–May prices</span></div>
+    </div>
+    <div class="chart" id="c-effects"></div>
+  </div>
+  <div class="note"><span class="k">Why beans differ</span><span>Beans show no response in either season. Most bean-growing areas plant in both seasons, and beans trade widely across East Africa, so one poor Ugandan season is buffered. Maize and sorghum, grown mainly once a year in much of the north and east, respond.</span></div>
+</section>
+
+<section class="f" id="trust">
+  <div class="f-head">
+    <div class="f-num">03 · How sure are we?</div>
+    <h2>The size is stable; the certainty is limited by the number of years</h2>
+    <p>The seven markets move together, so they add little independent evidence: the real sample is 15–16 years. Three stricter checks: a permutation test that compares the result with thousands of reshuffled rainfall histories, re-estimating with each year left out, and an independent sample of wholesale maize prices from 2006–2021.</p>
+  </div>
+  <div class="panel">
+    <div class="scroll"><table class="score" id="t-robust" style="min-width:760px"><thead><tr>
+      <th>Result</th><th class="r">Effect of a dry season</th><th class="r">Standard p</th><th class="r">Permutation p</th><th class="r">Range, one year left out</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="note"><span class="k">Reading</span><span>No single year drives any result: every leave-one-out estimate keeps its sign and size. The standard p-values overstate certainty, though. Only the <b>first-season maize effect</b> is confirmed in an independent dataset, which gives it medium confidence. The others are consistent but rest on one dataset.</span></div>
+</section>
+
+<section class="f" id="iod">
+  <div class="f-head">
+    <div class="f-num">04 · Early warning</div>
+    <h2>A warm western Indian Ocean in July–August has meant cheaper maize the next year</h2>
+    <p>Each dot is one year: the Indian Ocean Dipole in July–August, known by early September, against real maize prices the following February–May. A positive IOD brings wetter October–December rains (see the <a href="https://tayeruta.github.io/uganda-rainfall-analysis/reports/synthesis_report.html" style="color:var(--accent)">rainfall synthesis</a>), hence a larger second harvest.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-top">
+      <div><div class="panel-title">July–August IOD vs next year's Feb–May maize price</div><div class="panel-sub">Average across core markets · hover a dot for the year</div></div>
+      <div class="legend"><span><i class="sw" style="background:var(--wet);border-radius:50%"></i>Positive IOD (≥ +0.4 °C)</span><span><i class="sw" style="background:var(--muted);border-radius:50%"></i>Neutral</span><span><i class="sw" style="background:var(--dry);border-radius:50%"></i>Negative IOD (≤ −0.4 °C)</span><span><i class="sw line" style="background:var(--ink-2)"></i>Linear fit</span></div>
+    </div>
+    <div class="chart" id="c-iod"></div>
+  </div>
+  <div class="callout" id="iod-cards"></div>
+  <div class="note"><span class="k">Caution</span><span>This rests on 16 years of retail prices. The permutation p-value is 0.02 for maize, but the link does not appear in the older wholesale data. It is worth monitoring alongside official forecasts, not acting on alone.</span></div>
+</section>
+
+<section class="f" id="karamoja">
+  <div class="f-head">
+    <div class="f-num">05 · Karamoja</div>
+    <h2>Connected to the national market, but more exposed</h2>
+    <p>Karamoja's real staple prices since late 2018, against their own average. The 2022 spike began early in the year and peaked in June–July, <i>before</i> that year's harvest, during the global grain price shock that followed Russia's invasion of Ukraine and amid local insecurity. Poor 2022 and 2023 seasons kept prices high into 2023.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-top">
+      <div><div class="panel-title">Karamoja real prices, % vs 2018–26 average</div><div class="panel-sub">Average of Karamoja markets · each year's April–September rainfall below</div></div>
+      <div class="legend"><span><i class="sw line" style="background:var(--kar)"></i>Sorghum</span><span><i class="sw line" style="background:var(--wet)"></i>Maize</span></div>
+    </div>
+    <div class="chart" id="c-kar"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-top">
+      <div><div class="panel-title">How closely prices move together</div><div class="panel-sub">Correlation of trend- and season-adjusted prices, Oct 2018 – Jan 2026</div></div>
+      <div class="legend"><span><i class="sw" style="background:var(--wet)"></i>Core markets with each other</span><span><i class="sw" style="background:var(--kar)"></i>Karamoja with core markets</span></div>
+    </div>
+    <div class="chart" id="c-integ"></div>
+  </div>
+  <div class="note"><span class="k">Reading</span><span>Karamoja's maize prices track the core markets nearly as closely as those markets track each other, and its sorghum prices more closely; only beans are clearly less connected. Maize in Karamoja costs about <b class="num" id="n-lira">22%</b> more than in nearby Lira, a surplus-producing area: the cost of being a grain-deficit region. What makes Karamoja vulnerable is exposure, not isolation.</span></div>
+</section>
+
+<section class="f" id="faostat">
+  <div class="f-head">
+    <div class="f-num">06 · Crop statistics</div>
+    <h2>Uganda's national crop figures can't show weather shocks</h2>
+    <p>Area harvested as reported to FAOSTAT. A change in method in 2008 moves every crop at once, in opposite directions; in 2013–2015 (shaded) the figures barely move at all, the signature of projections. This is why the analysis uses market prices.</p>
+  </div>
+  <div class="mini" id="c-fao"></div>
+  <div class="panel">
+    <div class="scroll"><table class="score" id="t-fao" style="min-width:560px"><thead><tr>
+      <th>Crop</th><th class="r">Production change, 2008</th><th class="r">Link to rainfall (r), excl. 2008–15</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="note"><span class="k">Reading</span><span>Among the staples, only <b>sorghum</b> production tracks rainfall once the break and the projected years are removed. <b>Maize</b>, the main traded grain, shows no relationship at all. Analyses that estimate weather effects from these series measure the statistical method more than the harvest.</span></div>
+</section>
+
+<section class="f" id="meaning">
+  <div class="f-head">
+    <div class="f-num">07 · What it means</div>
+    <h2>Implications for farmers, markets and food security</h2>
+    <p>These follow from the price evidence. The storage and early-warning points in particular should be tested with farm-level data before they shape programmes.</p>
+  </div>
+  <div class="who">
+    <div class="panel">
+      <span class="tag wet"><i></i>Farmers</span>
+      <h3>Storage pays, if losses are low</h3>
+      <ul>
+        <li><b>Holding maize from harvest to the lean season earns about 25–30% in real terms</b> on average.</li>
+        <li>Traditional storage often loses 10–20% of grain, which eats most of that gain. Hermetic bags and warehouse receipts are what make storage worthwhile.</li>
+        <li>Prices peak when household stocks are lowest, so selling everything at harvest is the costliest choice.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <span class="tag wet"><i></i>Markets and policy</span>
+      <h3>Rainfall is a price signal months ahead</h3>
+      <ul>
+        <li><b>A poor March–May season signals higher maize prices from September</b>, three to six months ahead.</li>
+        <li>Warehouse-receipt systems and strategic reserves can buy at harvest and release in the lean season, damping the cycle.</li>
+        <li>Because regional harvests rise and fall together, national shortfalls need national responses.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <span class="tag dry"><i></i>Food security</span>
+      <h3>Karamoja's risk is exposure</h3>
+      <ul>
+        <li><b>Its staple swings the most within the year</b>, peaking June–August, when food assistance matters most.</li>
+        <li>Its prices respond to national and global shocks, as in 2022, not only to local rains.</li>
+        <li>A positive July–August IOD is a hopeful sign for next year's prices; a negative one is a reason for early preparedness.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="scroll"><table class="score conf-table" style="min-width:760px"><thead><tr><th>Finding</th><th>Evidence</th><th>Confidence</th></tr></thead><tbody>
+      <tr><td>Large, regular harvest-to-lean-season price cycle</td><td class="ev">Present in every market and staple, every year; maize swings 20–44%</td><td><span class="conf high">High</span></td></tr>
+      <tr><td>A dry first season raises maize prices</td><td class="ev">9% (retail, 2011–25) and 11% (wholesale, 2006–21) per standard deviation; permutation p = 0.03–0.08</td><td><span class="conf med">Medium</span></td></tr>
+      <tr><td>A dry second season raises sorghum prices</td><td class="ev">About 9%; stable across years left out; permutation p = 0.11; one dataset</td><td><span class="conf low">Suggestive</span></td></tr>
+      <tr><td>Positive July–August IOD → cheaper maize next lean season</td><td class="ev">About 24% per °C; permutation p = 0.02; not replicated in wholesale data</td><td><span class="conf low">Suggestive</span></td></tr>
+      <tr><td>Bean prices don't respond to Ugandan rainfall</td><td class="ev">No effect in either season or dataset</td><td><span class="conf med">Medium</span></td></tr>
+      <tr><td>Karamoja maize and sorghum move with the national market</td><td class="ev">Co-movement 0.67 for maize (core markets: 0.72) and 0.39 for sorghum (core: 0.28)</td><td><span class="conf high">High</span></td></tr>
+      <tr><td>FAOSTAT Uganda crop series can't measure weather shocks</td><td class="ev">2008 break, frozen 2013–15 area, implausible jumps; maize shows no rainfall link</td><td><span class="conf high">High</span></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<section class="f" id="methods">
+  <div class="f-head">
+    <div class="f-num">08 · Methods and limits</div>
+    <h2>How this was done</h2>
+  </div>
+  <div class="limits">
+    <div class="panel">
+      <h3><span class="tag wet"><i></i>Method</span></h3>
+      <ul>
+        <li>WFP monthly retail prices deflated by Uganda's consumer price index, logged, with each market's trend and calendar-month pattern removed</li>
+        <li>Outcome: average price anomaly over September–December (first season) or the next February–May (second season)</li>
+        <li>OLS with market fixed effects and the world maize price; exchange rate as a robustness check; errors clustered by year</li>
+        <li>Permutation tests, leave-one-year-out estimates, and an independent wholesale sample</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3><span class="tag dry"><i></i>Limits</span></h3>
+      <ul>
+        <li>15–16 years of prices; the permutation tests are the honest measure of certainty</li>
+        <li>Retail prices in towns, not farm-gate prices, which are lower and more volatile</li>
+        <li>A national price index for deflating; regional inflation can differ</li>
+        <li>Karamoja prices only from late 2018, too short to estimate rainfall effects there</li>
+      </ul>
+    </div>
+  </div>
+  <p class="next"><b>Next step.</b> Add satellite vegetation greenness (NDVI) over cropland as a direct, consistent measure of harvests, to test the full chain from rainfall to harvest to price.</p>
+</section>
+
+<footer>
+  <p><b>Sources.</b> Prices: World Food Programme via the Humanitarian Data Exchange. Consumer prices and crop statistics: FAOSTAT. World maize price: IMF via FRED. Rainfall and the Indian Ocean Dipole: CHIRPS and NOAA, from the <a href="https://tayeruta.github.io/uganda-rainfall-analysis/reports/synthesis_report.html" style="color:var(--accent)">Uganda rainfall analysis</a>.</p>
+  <p><b>Reproducibility.</b> Every number on this page comes from <span class="num">notebooks/02_rainfall_and_food_prices.ipynb</span> and <span class="num">scripts/build_report_data.py</span>.</p>
+</footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script id="report-data" type="application/json">{"profiles":{"Maize (white)":{"Gulu":{"p":[-10.36,-7.98,-6.21,4.22,15.13,12.45,9.36,-0.08,-8.64,-9.15,1.34,4.22],"swing":25.49,"karamoja":false},"Iganga":{"p":[-7.11,-12.9,-0.55,7.92,12.68,16.53,2.57,-5.68,-1.45,-2.35,-2.67,-3.2],"swing":29.43,"karamoja":false},"Jinja":{"p":[-8.53,-5.27,-4.0,7.61,15.56,19.51,16.55,1.06,-10.93,-11.01,-10.13,-3.59],"swing":30.53,"karamoja":false},"Kaabong":{"p":[-9.54,-11.22,0.25,7.86,16.66,25.75,16.77,7.78,-3.5,-13.44,-17.08,-9.96],"swing":42.83,"karamoja":true},"Kapchorwa":{"p":[-0.07,-2.47,1.38,1.83,11.53,13.1,18.35,1.61,-4.02,-11.66,-14.21,-9.94],"swing":32.56,"karamoja":false},"Karita":{"p":[-10.81,-4.25,-0.37,10.02,8.59,5.33,5.17,22.36,6.9,-15.71,-8.13,-12.32],"swing":38.07,"karamoja":true},"Kotido":{"p":[-6.51,-6.48,-0.88,-3.01,0.38,4.77,13.72,0.96,-6.5,-4.49,1.98,8.19],"swing":20.23,"karamoja":true},"Lira":{"p":[-11.82,-5.21,-2.18,5.39,16.98,16.54,16.2,3.06,-6.17,-11.25,-9.04,-6.15],"swing":28.81,"karamoja":false},"Makaratin":{"p":[-14.43,-8.04,-9.06,13.33,11.58,17.59,19.06,15.61,-3.33,-12.09,-12.34,-8.36],"swing":33.48,"karamoja":true},"Mbarara":{"p":[-11.89,-9.06,-4.86,2.01,4.54,3.73,9.94,8.15,1.78,-3.33,-2.56,4.05],"swing":21.83,"karamoja":false},"Namalu":{"p":[-6.35,2.58,7.65,9.46,13.18,14.37,10.89,2.38,-7.5,-14.77,-14.67,-10.64],"swing":29.14,"karamoja":true},"Owino":{"p":[-11.27,-6.18,0.21,7.4,13.07,14.2,1.36,-3.07,-2.25,-6.78,-1.37,-2.11],"swing":25.47,"karamoja":false}},"Sorghum":{"Gulu":{"p":[-5.54,0.31,-2.68,-0.32,5.86,3.71,0.64,2.47,0.1,-5.56,0.85,0.8],"swing":11.42,"karamoja":false},"Iganga":{"p":[2.23,3.45,7.07,2.69,-2.38,-4.53,-3.12,0.23,-2.01,-1.12,-1.84,-0.1],"swing":11.6,"karamoja":false},"Jinja":{"p":[-8.24,-2.92,-3.72,3.77,10.19,13.61,2.3,1.7,-4.63,-1.54,-3.4,-4.9],"swing":21.85,"karamoja":false},"Kaabong":{"p":[-8.88,-21.25,-1.12,10.37,10.03,12.39,22.56,15.35,0.3,-6.35,-13.14,-10.49],"swing":43.81,"karamoja":true},"Kapchorwa":{"p":[0.35,-2.26,6.7,3.78,1.28,4.54,3.0,7.1,1.1,-6.7,-8.78,-8.38],"swing":15.88,"karamoja":false},"Kotido":{"p":[-4.26,-10.94,-5.21,-2.35,9.03,16.8,18.08,16.53,-12.47,-14.31,-6.12,2.68],"swing":32.38,"karamoja":true},"Lira":{"p":[-3.16,-4.07,-1.81,-3.49,0.41,-0.76,6.41,2.0,3.82,-3.99,3.21,2.09],"swing":10.47,"karamoja":false},"Makaratin":{"p":[-17.23,-9.14,-13.11,0.77,15.41,21.71,22.33,19.07,8.79,-3.29,-15.21,-16.79],"swing":39.56,"karamoja":true},"Mbarara":{"p":[0.91,0.3,-2.71,-0.83,2.32,2.88,4.21,0.6,0.09,-3.54,-3.06,-0.84],"swing":7.75,"karamoja":false},"Namalu":{"p":[-0.27,-1.83,2.07,9.6,7.12,13.26,13.01,-1.39,-9.42,-14.54,-9.78,-3.31],"swing":27.81,"karamoja":true},"Owino":{"p":[-9.09,-11.14,-0.04,0.17,5.43,11.99,1.88,7.89,6.74,-6.13,-0.91,-4.05],"swing":23.13,"karamoja":false}},"Beans":{"Gulu":{"p":[-7.6,-5.72,-5.52,7.66,14.24,14.58,3.26,-2.69,-1.6,-2.72,-7.63,-2.96],"swing":22.21,"karamoja":false},"Iganga":{"p":[1.34,2.4,4.25,8.36,11.2,1.69,-7.16,-3.04,3.95,-4.38,-6.38,-9.94],"swing":21.14,"karamoja":false},"Jinja":{"p":[-8.5,-4.24,-1.07,7.62,13.06,11.0,1.88,-4.4,3.31,1.22,-7.24,-9.58],"swing":22.63,"karamoja":false},"Kaabong":{"p":[-10.11,1.4,1.4,7.34,11.95,14.33,4.67,-2.5,0.17,-4.28,-10.81,-9.77],"swing":25.14,"karamoja":true},"Kapchorwa":{"p":[-4.55,-0.49,-4.13,10.79,18.18,4.11,-3.56,0.37,1.78,-3.23,-5.97,-10.13],"swing":28.31,"karamoja":false},"Karita":{"p":[-5.3,-0.78,-4.74,1.68,7.47,12.38,10.84,1.84,-6.09,-9.72,-4.74,-0.2],"swing":22.11,"karamoja":true},"Kotido":{"p":[-5.39,-5.62,-9.29,9.18,11.31,12.74,-0.25,-1.0,-0.79,-2.84,-4.28,-1.11],"swing":22.03,"karamoja":true},"Lira":{"p":[-5.83,5.47,1.76,12.68,18.49,7.69,-4.43,-3.3,-2.8,-2.54,-10.14,-12.53],"swing":31.03,"karamoja":false},"Makaratin":{"p":[-9.11,-5.5,-7.57,1.24,8.09,8.4,10.37,7.61,4.05,-4.56,-6.16,-4.06],"swing":19.48,"karamoja":true},"Mbarara":{"p":[-5.54,-6.42,-3.62,6.51,7.79,0.61,0.59,0.28,6.51,1.2,-2.13,-4.5],"swing":14.21,"karamoja":false},"Namalu":{"p":[2.94,2.47,2.54,20.72,27.45,14.11,-7.93,-17.04,-17.64,-7.28,-6.73,-3.22],"swing":45.09,"karamoja":true},"Owino":{"p":[-7.86,-2.06,5.15,12.74,22.65,0.4,-5.04,-1.8,2.88,-1.68,-9.35,-11.23],"swing":33.88,"karamoja":false}}},"effects":[{"commodity":"Maize (white)","season":"A","rainfall":"rain_regional","pct":8.372,"lo":2.5245,"hi":14.5531,"p":0.0045,"years":15},{"commodity":"Maize (white)","season":"A","rainfall":"rain_national","pct":9.1006,"lo":3.2542,"hi":15.278,"p":0.0019,"years":15},{"commodity":"Maize (white)","season":"B","rainfall":"rain_regional","pct":6.7372,"lo":-1.0789,"hi":15.171,"p":0.0932,"years":16},{"commodity":"Maize (white)","season":"B","rainfall":"rain_national","pct":6.9509,"lo":-1.0944,"hi":15.6507,"p":0.0918,"years":16},{"commodity":"Maize flour","season":"A","rainfall":"rain_regional","pct":5.2218,"lo":0.8008,"hi":9.8366,"p":0.0201,"years":16},{"commodity":"Maize flour","season":"A","rainfall":"rain_national","pct":5.443,"lo":0.8347,"hi":10.2619,"p":0.0199,"years":16},{"commodity":"Maize flour","season":"B","rainfall":"rain_regional","pct":4.6132,"lo":-2.0734,"hi":11.7565,"p":0.1807,"years":17},{"commodity":"Maize flour","season":"B","rainfall":"rain_national","pct":4.0811,"lo":-2.8385,"hi":11.4935,"p":0.2537,"years":17},{"commodity":"Sorghum","season":"A","rainfall":"rain_regional","pct":3.8939,"lo":-1.3839,"hi":9.4542,"p":0.1505,"years":15},{"commodity":"Sorghum","season":"A","rainfall":"rain_national","pct":4.6342,"lo":-0.4474,"hi":9.9751,"p":0.0749,"years":15},{"commodity":"Sorghum","season":"B","rainfall":"rain_regional","pct":9.2207,"lo":3.7535,"hi":14.9759,"p":0.0007,"years":16},{"commodity":"Sorghum","season":"B","rainfall":"rain_national","pct":8.307,"lo":2.3827,"hi":14.5741,"p":0.0055,"years":16},{"commodity":"Beans","season":"A","rainfall":"rain_regional","pct":3.0248,"lo":-1.8055,"hi":8.0928,"p":0.2249,"years":18},{"commodity":"Beans","season":"A","rainfall":"rain_national","pct":3.5723,"lo":-0.3896,"hi":7.6919,"p":0.0787,"years":18},{"commodity":"Beans","season":"B","rainfall":"rain_regional","pct":-2.7903,"lo":-7.1299,"hi":1.752,"p":0.2253,"years":18},{"commodity":"Beans","season":"B","rainfall":"rain_national","pct":-3.6902,"lo":-7.809,"hi":0.6127,"p":0.0916,"years":18}],"robustness":[{"commodity":"Maize (white)","season":"A","rainfall":"rain_national","panel_pct":-8.3409,"clustered_p":0.0019,"yearly_pct":-7.8946,"permutation_p":0.076,"years":15,"leave_one_year_out_min":-10.2428,"leave_one_year_out_max":-7.0316,"dry_panel_pct":9.0999,"dry_yearly_pct":8.5712,"dry_leave_one_year_out_min":11.4117,"dry_leave_one_year_out_max":7.5635},{"commodity":"Maize (white)","season":"B","rainfall":"rain_national","panel_pct":-6.5029,"clustered_p":0.0918,"yearly_pct":-6.5503,"permutation_p":0.1464,"years":16,"leave_one_year_out_min":-9.3359,"leave_one_year_out_max":-3.8071,"dry_panel_pct":6.9552,"dry_yearly_pct":7.0095,"dry_leave_one_year_out_min":10.2973,"dry_leave_one_year_out_max":3.9578},{"commodity":"Sorghum","season":"B","rainfall":"rain_regional","panel_pct":-8.4457,"clustered_p":0.0007,"yearly_pct":-6.5434,"permutation_p":0.1134,"years":16,"leave_one_year_out_min":-10.1031,"leave_one_year_out_max":-7.3553,"dry_panel_pct":9.2247,"dry_yearly_pct":7.0015,"dry_leave_one_year_out_min":11.2385,"dry_leave_one_year_out_max":7.9393},{"commodity":"Maize flour","season":"A","rainfall":"rain_national","panel_pct":-5.1667,"clustered_p":0.0199,"yearly_pct":-5.0211,"permutation_p":0.1814,"years":16,"leave_one_year_out_min":-6.9872,"leave_one_year_out_max":-3.8668,"dry_panel_pct":5.4482,"dry_yearly_pct":5.2866,"dry_leave_one_year_out_min":7.5121,"dry_leave_one_year_out_max":4.0224}],"wholesale":[{"season":"A","rainfall":"rain_national","years":"2006\u20132021","panel_pct":-9.5993,"clustered_p":0.0003,"yearly_pct":-10.4541,"permutation_p":0.0315,"dry_panel_pct":10.6186},{"season":"A","rainfall":"rain_regional","years":"2006\u20132021","panel_pct":-9.8715,"clustered_p":0.0018,"yearly_pct":-11.7631,"permutation_p":0.0395,"dry_panel_pct":10.9527},{"season":"B","rainfall":"rain_national","years":"2006\u20132021","panel_pct":-4.0686,"clustered_p":0.3352,"yearly_pct":-3.8101,"permutation_p":0.5322,"dry_panel_pct":4.2412}],"iod":[{"commodity":"Maize (white)","pct_per_degC":-23.7062,"clustered_p":0.0012,"permutation_p":0.0195,"loo_min":-26.7222,"loo_max":-16.0285,"years":16},{"commodity":"Maize flour","pct_per_degC":-16.6255,"clustered_p":0.0447,"permutation_p":0.091,"loo_min":-20.5672,"loo_max":-8.3152,"years":17},{"commodity":"Sorghum","pct_per_degC":-18.5669,"clustered_p":0.01,"permutation_p":0.079,"loo_min":-21.4667,"loo_max":-13.044,"years":16},{"commodity":"Beans","pct_per_degC":-1.6237,"clustered_p":0.8017,"permutation_p":0.927,"loo_min":-5.8406,"loo_max":2.368,"years":18}],"iod_scatter":[{"year":2010,"iod":-0.031,"pct":13.5266},{"year":2011,"iod":0.2835,"pct":1.8724},{"year":2012,"iod":0.599,"pct":-2.4815},{"year":2013,"iod":-0.1875,"pct":-3.4436},{"year":2014,"iod":-0.3675,"pct":-2.7879},{"year":2015,"iod":0.3965,"pct":-8.0899},{"year":2016,"iod":-0.6,"pct":37.6331},{"year":2017,"iod":0.4345,"pct":-8.2978},{"year":2018,"iod":0.087,"pct":-4.7881},{"year":2019,"iod":0.5165,"pct":-6.7956},{"year":2020,"iod":0.068,"pct":-32.1731},{"year":2021,"iod":-0.164,"pct":9.7125},{"year":2022,"iod":-0.2205,"pct":31.3983},{"year":2023,"iod":0.662,"pct":-17.3759},{"year":2024,"iod":0.15,"pct":0.8457},{"year":2025,"iod":-0.246,"pct":21.0346}],"karamoja":{"series":{"Maize (white)":[{"d":"2018-10","v":-39.4994},{"d":"2018-11","v":-30.2109},{"d":"2018-12","v":-39.0486},{"d":"2019-01","v":-18.8292},{"d":"2019-02","v":-8.9493},{"d":"2019-03","v":1.2349},{"d":"2019-04","v":8.5509},{"d":"2019-05","v":15.5881},{"d":"2019-06","v":16.0905},{"d":"2019-07","v":19.1669},{"d":"2019-08","v":14.4441},{"d":"2019-09","v":-1.5978},{"d":"2019-10","v":-3.9575},{"d":"2019-11","v":2.9672},{"d":"2019-12","v":3.7413},{"d":"2020-01","v":-6.0182},{"d":"2020-02","v":-9.8962},{"d":"2020-04","v":-5.5695},{"d":"2020-05","v":5.132},{"d":"2020-06","v":-0.3404},{"d":"2020-07","v":-7.6727},{"d":"2020-08","v":-1.7129},{"d":"2020-09","v":-12.5416},{"d":"2020-10","v":-10.5397},{"d":"2020-11","v":-19.5464},{"d":"2020-12","v":-16.318},{"d":"2021-01","v":-18.1228},{"d":"2021-03","v":-17.243},{"d":"2021-04","v":-21.5833},{"d":"2021-05","v":-16.497},{"d":"2021-06","v":-6.4955},{"d":"2021-07","v":-4.5248},{"d":"2021-08","v":-1.7278},{"d":"2021-09","v":-0.4377},{"d":"2021-10","v":3.0582},{"d":"2021-11","v":-1.9677},{"d":"2021-12","v":-4.3686},{"d":"2022-01","v":-10.2148},{"d":"2022-04","v":29.0414},{"d":"2022-05","v":32.907},{"d":"2022-06","v":56.7778},{"d":"2022-07","v":95.2374},{"d":"2022-08","v":44.1983},{"d":"2022-09","v":26.5382},{"d":"2022-10","v":24.6565},{"d":"2022-11","v":23.4923},{"d":"2022-12","v":32.7476},{"d":"2023-01","v":23.8013},{"d":"2023-02","v":27.1061},{"d":"2023-03","v":40.6823},{"d":"2023-04","v":41.2316},{"d":"2023-05","v":38.0398},{"d":"2023-06","v":45.5715},{"d":"2023-07","v":35.8419},{"d":"2023-08","v":6.8043},{"d":"2023-09","v":4.9858},{"d":"2023-10","v":1.9683},{"d":"2023-11","v":-10.6704},{"d":"2023-12","v":-12.1165},{"d":"2024-01","v":-15.7529},{"d":"2024-02","v":-22.9624},{"d":"2024-03","v":-22.8163},{"d":"2024-04","v":-19.8842},{"d":"2024-05","v":-18.2395},{"d":"2024-06","v":-23.9579},{"d":"2024-07","v":-25.1098},{"d":"2024-08","v":-25.8494},{"d":"2024-09","v":-28.9813},{"d":"2024-10","v":-29.6863},{"d":"2024-11","v":-28.7304},{"d":"2024-12","v":-19.1716},{"d":"2025-01","v":-16.8014},{"d":"2025-02","v":-16.5693},{"d":"2025-03","v":-10.1807},{"d":"2025-04","v":1.3214},{"d":"2025-05","v":14.5333},{"d":"2025-06","v":25.2817},{"d":"2025-07","v":31.2573},{"d":"2025-08","v":7.5811},{"d":"2025-09","v":-21.0235},{"d":"2025-10","v":-27.0861},{"d":"2025-11","v":-24.4175},{"d":"2025-12","v":-22.4898},{"d":"2026-01","v":-23.6495}],"Sorghum":[{"d":"2018-10","v":-38.1168},{"d":"2018-11","v":-25.3843},{"d":"2018-12","v":-23.3347},{"d":"2019-01","v":-13.5617},{"d":"2019-02","v":-13.1943},{"d":"2019-03","v":-14.9969},{"d":"2019-04","v":13.7685},{"d":"2019-05","v":24.7737},{"d":"2019-06","v":26.347},{"d":"2019-07","v":32.3119},{"d":"2019-08","v":18.3033},{"d":"2019-09","v":1.4382},{"d":"2019-10","v":-10.7878},{"d":"2019-11","v":-8.5864},{"d":"2019-12","v":-11.4603},{"d":"2020-01","v":-9.9397},{"d":"2020-02","v":-12.4456},{"d":"2020-04","v":-11.0034},{"d":"2020-05","v":-9.4976},{"d":"2020-06","v":-3.2353},{"d":"2020-07","v":-4.2231},{"d":"2020-08","v":6.4576},{"d":"2020-09","v":1.6432},{"d":"2020-10","v":3.8273},{"d":"2020-11","v":-8.1445},{"d":"2020-12","v":-12.7417},{"d":"2021-01","v":-21.255},{"d":"2021-03","v":-27.3786},{"d":"2021-04","v":-20.9138},{"d":"2021-05","v":-9.2645},{"d":"2021-06","v":-2.7816},{"d":"2021-07","v":-4.212},{"d":"2021-08","v":-5.0931},{"d":"2021-09","v":-8.8993},{"d":"2021-10","v":8.4575},{"d":"2021-11","v":-1.7715},{"d":"2021-12","v":-2.1728},{"d":"2022-01","v":10.9687},{"d":"2022-04","v":25.6103},{"d":"2022-05","v":43.3256},{"d":"2022-06","v":77.5119},{"d":"2022-07","v":84.2573},{"d":"2022-08","v":37.6673},{"d":"2022-09","v":13.581},{"d":"2022-10","v":19.1073},{"d":"2022-11","v":14.5655},{"d":"2022-12","v":14.2083},{"d":"2023-01","v":12.47},{"d":"2023-02","v":7.3433},{"d":"2023-03","v":20.7181},{"d":"2023-04","v":26.8121},{"d":"2023-05","v":28.6895},{"d":"2023-06","v":31.0131},{"d":"2023-07","v":18.1087},{"d":"2023-08","v":1.5906},{"d":"2023-09","v":-4.8789},{"d":"2023-10","v":-6.8271},{"d":"2023-11","v":-14.5963},{"d":"2023-12","v":-11.4},{"d":"2024-01","v":-17.5785},{"d":"2024-02","v":-21.4659},{"d":"2024-03","v":-21.7544},{"d":"2024-04","v":-19.0021},{"d":"2024-05","v":-20.1857},{"d":"2024-06","v":-20.666},{"d":"2024-07","v":-22.4172},{"d":"2024-08","v":-22.3037},{"d":"2024-09","v":-27.4242},{"d":"2024-10","v":-22.8822},{"d":"2024-11","v":-23.3839},{"d":"2024-12","v":-9.537},{"d":"2025-01","v":-11.5505},{"d":"2025-02","v":-15.674},{"d":"2025-03","v":-8.3173},{"d":"2025-04","v":5.9903},{"d":"2025-05","v":19.1325},{"d":"2025-06","v":26.7539},{"d":"2025-07","v":40.1476},{"d":"2025-08","v":12.5343},{"d":"2025-09","v":-8.7951},{"d":"2025-10","v":-19.2887},{"d":"2025-11","v":-18.6994},{"d":"2025-12","v":-10.7844},{"d":"2026-01","v":-15.626}]},"rain":{"2018":2.0528,"2019":0.2845,"2020":2.0521,"2021":-0.1975,"2022":-0.5008,"2023":-0.9813,"2024":0.6922,"2025":0.7783},"integration":{"Maize (white)":{"gap_vs_Kampala_%":-20.4756,"gap_vs_Lira_%":22.454,"co-movement core-core":0.7247,"co-movement Karamoja-core":0.6682,"co-movement Karamoja-Karamoja":0.7117},"Sorghum":{"gap_vs_Kampala_%":-48.2358,"gap_vs_Lira_%":12.5298,"co-movement core-core":0.276,"co-movement Karamoja-core":0.3946,"co-movement Karamoja-Karamoja":0.5755},"Beans":{"gap_vs_Kampala_%":-2.9718,"gap_vs_Lira_%":1.9791,"co-movement core-core":0.6626,"co-movement Karamoja-core":0.3612,"co-movement Karamoja-Karamoja":0.3332}}},"faostat":{"area":{"Maize (corn)":[{"y":1990,"v":401.0},{"y":1991,"v":420.0},{"y":1992,"v":438.0},{"y":1993,"v":503.0},{"y":1994,"v":563.0},{"y":1995,"v":571.0},{"y":1996,"v":584.0},{"y":1997,"v":598.0},{"y":1998,"v":616.0},{"y":1999,"v":608.0},{"y":2000,"v":629.0},{"y":2001,"v":652.0},{"y":2002,"v":676.0},{"y":2003,"v":710.0},{"y":2004,"v":750.0},{"y":2005,"v":780.0},{"y":2006,"v":819.0},{"y":2007,"v":844.0},{"y":2008,"v":1052.0},{"y":2009,"v":942.0},{"y":2010,"v":1032.0},{"y":2011,"v":1062.96},{"y":2012,"v":1093.786},{"y":2013,"v":1101.453},{"y":2014,"v":1103.185},{"y":2015,"v":1125.168},{"y":2016,"v":1156.035},{"y":2017,"v":1545.635},{"y":2018,"v":2480.0},{"y":2019,"v":1887.0},{"y":2020,"v":2036.0},{"y":2021,"v":1591.0},{"y":2022,"v":2154.0},{"y":2023,"v":2266.0},{"y":2024,"v":2300.0}],"Beans, dry":[{"y":1990,"v":494.915},{"y":1991,"v":509.762},{"y":1992,"v":536.0},{"y":1993,"v":552.0},{"y":1994,"v":574.0},{"y":1995,"v":600.0},{"y":1996,"v":615.0},{"y":1997,"v":630.0},{"y":1998,"v":645.0},{"y":1999,"v":669.0},{"y":2000,"v":699.0},{"y":2001,"v":731.0},{"y":2002,"v":765.0},{"y":2003,"v":780.0},{"y":2004,"v":812.0},{"y":2005,"v":828.0},{"y":2006,"v":849.0},{"y":2007,"v":870.0},{"y":2008,"v":651.0},{"y":2009,"v":616.0},{"y":2010,"v":633.0},{"y":2011,"v":653.889},{"y":2012,"v":669.0},{"y":2013,"v":672.273},{"y":2014,"v":674.29},{"y":2015,"v":674.964},{"y":2016,"v":483.337},{"y":2017,"v":588.185},{"y":2018,"v":543.511},{"y":2019,"v":546.458},{"y":2020,"v":923.554},{"y":2021,"v":963.0},{"y":2022,"v":1034.0},{"y":2023,"v":897.083},{"y":2024,"v":863.246}],"Sorghum":[{"y":1990,"v":240.0},{"y":1991,"v":244.949},{"y":1992,"v":250.0},{"y":1993,"v":255.0},{"y":1994,"v":260.0},{"y":1995,"v":266.0},{"y":1996,"v":271.0},{"y":1997,"v":276.0},{"y":1998,"v":280.0},{"y":1999,"v":275.0},{"y":2000,"v":280.0},{"y":2001,"v":282.0},{"y":2002,"v":285.0},{"y":2003,"v":290.0},{"y":2004,"v":285.0},{"y":2005,"v":294.0},{"y":2006,"v":308.0},{"y":2007,"v":314.0},{"y":2008,"v":321.0},{"y":2009,"v":340.0},{"y":2010,"v":355.0},{"y":2011,"v":364.0},{"y":2012,"v":373.0},{"y":2013,"v":373.0},{"y":2014,"v":373.0},{"y":2015,"v":373.382},{"y":2016,"v":328.571},{"y":2017,"v":193.724},{"y":2018,"v":252.147},{"y":2019,"v":96.704},{"y":2020,"v":171.44},{"y":2021,"v":341.0},{"y":2022,"v":318.0},{"y":2023,"v":320.0},{"y":2024,"v":320.0}],"Cassava, fresh":[{"y":1990,"v":412.0},{"y":1991,"v":389.0},{"y":1992,"v":362.0},{"y":1993,"v":369.0},{"y":1994,"v":320.0},{"y":1995,"v":332.0},{"y":1996,"v":335.0},{"y":1997,"v":342.0},{"y":1998,"v":356.0},{"y":1999,"v":375.0},{"y":2000,"v":401.0},{"y":2001,"v":390.0},{"y":2002,"v":398.0},{"y":2003,"v":405.0},{"y":2004,"v":407.0},{"y":2005,"v":387.0},{"y":2006,"v":379.0},{"y":2007,"v":386.0},{"y":2008,"v":398.0},{"y":2009,"v":411.0},{"y":2010,"v":490.819},{"y":2011,"v":552.214},{"y":2012,"v":851.0},{"y":2013,"v":851.0},{"y":2014,"v":852.0},{"y":2015,"v":852.34},{"y":2016,"v":1029.409},{"y":2017,"v":1218.614},{"y":2018,"v":1627.887},{"y":2019,"v":965.976},{"y":2020,"v":758.218},{"y":2021,"v":992.665},{"y":2022,"v":1006.129},{"y":2023,"v":901.376},{"y":2024,"v":826.544}],"Plantains and cooking bananas":[{"y":1990,"v":1388.0},{"y":1991,"v":1430.0},{"y":1992,"v":1459.0},{"y":1993,"v":1488.0},{"y":1994,"v":1499.999},{"y":1995,"v":1512.0},{"y":1996,"v":1524.0},{"y":1997,"v":1538.0},{"y":1998,"v":1553.0},{"y":1999,"v":1570.0},{"y":2000,"v":1598.0},{"y":2001,"v":1622.0},{"y":2002,"v":1648.0},{"y":2003,"v":1661.0},{"y":2004,"v":1670.0},{"y":2005,"v":1675.0},{"y":2006,"v":1677.0},{"y":2007,"v":1678.0},{"y":2008,"v":919.0},{"y":2009,"v":942.0},{"y":2010,"v":978.0},{"y":2011,"v":978.976},{"y":2012,"v":979.0},{"y":2013,"v":972.125},{"y":2014,"v":973.292},{"y":2015,"v":934.42},{"y":2016,"v":758.665},{"y":2017,"v":1020.0},{"y":2018,"v":1440.0},{"y":2019,"v":2093.068},{"y":2020,"v":2639.72},{"y":2021,"v":2509.284},{"y":2022,"v":2531.291},{"y":2023,"v":2631.25},{"y":2024,"v":2694.018}]},"change_2008":{"Maize (corn)":83.4604,"Beans, dry":109.6552,"Sorghum":-25.1961,"Millet":-62.4317,"Cassava, fresh":-42.1754,"Sweet potatoes":-32.3965,"Plantains and cooking bananas":-54.187,"Potatoes":-77.3846,"Soya beans":-87.5},"rain_response":{"Maize (corn)":{"r":0.1279,"p":0.5335},"Sorghum":{"r":0.5426,"p":0.0042},"Beans, dry":{"r":0.2922,"p":0.1475},"Cassava, fresh":{"r":0.2256,"p":0.2678},"Millet":{"r":-0.1492,"p":0.4669},"Sweet potatoes":{"r":-0.0638,"p":0.7569}}}}</script>
+<script>
+(function(){
+const D = JSON.parse(document.getElementById('report-data').textContent);
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const sgn0 = d3.format('+.0f'), sgn1 = d3.format('+.1f'), fmt2 = d3.format('.2f');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const pTxt = p => p < 0.001 ? 'p < 0.001' : 'p = ' + (+p.toPrecision(2)).toString();
+const pill = p => `<span class="pill ${p < 0.05 ? 'sig' : p < 0.1 ? 'border' : 'ns'}">${pTxt(p)}</span>`;
+const COM = {'Maize (white)': 'Maize', 'Sorghum': 'Sorghum', 'Beans': 'Beans', 'Maize flour': 'Maize flour'};
+
+const tip = document.getElementById('tip');
+function showTip(html, ev){
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect(), pad = 14;
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - pad;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - pad;
+  tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+}
+const hideTip = () => { tip.style.opacity = 0; };
+const row = (k, v, c) => `<div class="row"><span>${c ? `<i class="dot" style="background:${c}"></i>` : ''}${k}</span><b>${v}</b></div>`;
+function frame(el, h, m){
+  if (typeof el === 'string') el = document.getElementById(el);
+  el.innerHTML = '';
+  const W = Math.max(260, el.clientWidth);
+  const svg = d3.select(el).append('svg').attr('width', W).attr('height', h).attr('viewBox', `0 0 ${W} ${h}`);
+  const g = svg.append('g').attr('transform', `translate(${m.l},${m.t})`);
+  return {el, svg, g, w: W - m.l - m.r, h: h - m.t - m.b};
+}
+function yGrid(f, y, fmt, n){
+  f.g.append('g').call(d3.axisLeft(y).ticks(n || 5).tickSize(-f.w).tickFormat(fmt))
+    .call(a => a.selectAll('.tick line').attr('stroke', d => d === 0 ? css('--ink-2') : css('--grid'))).call(a => a.selectAll('.tick text').attr('x', -6));
+}
+const avg = arr => arr[0].map((_, i) => d3.mean(arr, a => a[i]));
+
+/* KPIs */
+function fill(){
+  const mz = Object.values(D.profiles['Maize (white)']);
+  document.getElementById('k-swing').innerHTML = Math.round(d3.mean(mz, m => m.swing)) + '<small>%</small>';
+  const e = D.effects.find(e => e.commodity === 'Maize (white)' && e.season === 'A' && e.rainfall === 'rain_national');
+  document.getElementById('k-maize').innerHTML = sgn0(e.pct) + '<small>%</small>';
+  document.getElementById('n-lira').textContent = Math.round(D.karamoja.integration['Maize (white)']['gap_vs_Lira_%']) + '%';
+}
+
+/* 01 seasonal cycle */
+let cyc = 'Maize (white)';
+function cycle(){
+  const P = D.profiles[cyc], ms = Object.keys(P);
+  const core = ms.filter(m => !P[m].karamoja), kar = ms.filter(m => P[m].karamoja);
+  const ca = avg(core.map(m => P[m].p)), ka = avg(kar.map(m => P[m].p));
+  const isS = innerWidth < 600;
+  const f = frame('c-cycle', isS ? 260 : 320, {t:14, r:16, b:28, l:44});
+  const x = d3.scalePoint().domain(d3.range(12)).range([0, f.w]);
+  const y = d3.scaleLinear().domain([-27, 27]).range([f.h, 0]);
+  yGrid(f, y, d => d3.format('+d')(d) + '%', 6);
+  f.g.append('g').attr('transform', `translate(0,${f.h})`).call(d3.axisBottom(x).tickFormat(i => isS ? MON[i][0] : MON[i]).tickSize(0)).call(a => a.selectAll('text').attr('dy','1.2em'));
+  const line = d3.line().x((d, i) => x(i)).y(d => y(Math.max(-27, Math.min(27, d)))).curve(d3.curveMonotoneX);
+  ms.forEach(m => f.g.append('path').attr('d', line(P[m].p)).attr('fill','none').attr('stroke', P[m].karamoja ? css('--kar') : css('--wet')).attr('stroke-width', 1).attr('opacity', .28));
+  [[ca, css('--wet'), 'Core markets'], [ka, css('--kar'), 'Karamoja']].forEach(([a, c, n]) => {
+    f.g.append('path').attr('d', line(a)).attr('fill','none').attr('stroke', c).attr('stroke-width', 3).attr('stroke-linecap','round');
+    const hi = d3.maxIndex(a), lo = d3.minIndex(a);
+    [hi, lo].forEach(i => f.g.append('circle').attr('cx', x(i)).attr('cy', y(a[i])).attr('r', 4.5).attr('fill', c).attr('stroke', css('--panel')).attr('stroke-width', 2));
+  });
+  const cross = f.g.append('line').attr('y1', 0).attr('y2', f.h).attr('stroke', css('--ink-2')).attr('opacity', 0);
+  f.g.append('rect').attr('width', f.w).attr('height', f.h).attr('fill','transparent')
+    .on('pointermove', ev => { const i = Math.max(0, Math.min(11, Math.round(d3.pointer(ev)[0] / x.step())));
+      cross.attr('x1', x(i)).attr('x2', x(i)).attr('opacity', .45);
+      showTip(`<div class="t">${COM[cyc]} · ${MON[i]}</div>${row('Core markets', sgn0(ca[i]) + '%', css('--wet'))}${row('Karamoja', sgn0(ka[i]) + '%', css('--kar'))}`, ev); })
+    .on('pointerleave', () => { hideTip(); cross.attr('opacity', 0); });
+  const sw = arr => d3.max(arr) - d3.min(arr);
+  const cards = [
+    ['Core markets', Math.round(d3.mean(core, m => P[m].swing)) + '%', `Average swing between the cheapest month (${MON[d3.minIndex(ca)]}) and the dearest (${MON[d3.maxIndex(ca)]}).`, 'wet'],
+    ['Karamoja', Math.round(d3.mean(kar, m => P[m].swing)) + '%', `Average swing across Karamoja markets, dearest in ${MON[d3.maxIndex(ka)]}, in the lean season before harvest.`, 'dry'],
+    ['Widest single market', Math.round(d3.max(ms, m => P[m].swing)) + '%', `${ms[d3.maxIndex(ms, m => P[m].swing)]}: the largest yearly swing for ${COM[cyc].toLowerCase()} in the data.`, 'wet'],
+  ];
+  document.getElementById('cycle-cards').innerHTML = cards.map(([t, v, p, c]) => `<div class="panel"><span class="tag ${c}"><i></i>${t}</span><div class="big num">${v}</div><p>${p}</p></div>`).join('');
+}
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+  cyc = b.dataset.k; document.querySelectorAll('.tabs button').forEach(o => o.setAttribute('aria-pressed', o === b)); cycle();
+}));
+
+/* 02 effects forest plot */
+function effects(){
+  const isS = innerWidth < 600;
+  const coms = ['Maize (white)', 'Maize flour', 'Sorghum', 'Beans'];
+  const E = D.effects.filter(e => e.rainfall === 'rain_national');
+  const f = frame('c-effects', 70 * coms.length + 40, {t:8, r:60, b:30, l: isS ? 92 : 120});
+  const y = d3.scaleBand().domain(coms).range([0, f.h]).padding(.18);
+  const yy = d3.scaleBand().domain(['A', 'B']).range([0, y.bandwidth()]).padding(.2);
+  const x = d3.scaleLinear().domain([-10, 22]).range([0, f.w]);
+  f.g.append('g').attr('transform', `translate(0,${f.h})`).call(d3.axisBottom(x).ticks(isS ? 3 : 8).tickSize(-f.h).tickFormat(d => d3.format('+d')(d) + '%'))
+    .call(a => a.selectAll('.tick line').attr('stroke', d => d === 0 ? css('--ink-2') : css('--grid'))).call(a => a.selectAll('.tick text').attr('dy','1.1em'));
+  coms.forEach(c => f.g.append('text').attr('x', -12).attr('y', y(c) + y.bandwidth()/2 + 4).attr('text-anchor','end').attr('class','lab').style('fill', css('--ink')).text(COM[c]));
+  E.forEach(e => {
+    const cy = y(e.commodity) + yy(e.season) + yy.bandwidth()/2, col = css(e.season === 'A' ? '--a' : '--b');
+    f.g.append('line').attr('x1', x(e.lo)).attr('x2', x(e.hi)).attr('y1', cy).attr('y2', cy).attr('stroke', col).attr('stroke-width', 2).attr('stroke-linecap','round').attr('opacity', .7);
+    f.g.append('circle').attr('cx', x(e.pct)).attr('cy', cy).attr('r', 6.5).attr('fill', e.p < 0.05 ? col : css('--panel')).attr('stroke', col).attr('stroke-width', 2.5)
+      .on('pointermove', ev => showTip(`<div class="t">${COM[e.commodity]} · ${e.season === 'A' ? 'first' : 'second'} season</div>${row('Price change', sgn1(e.pct) + '%', col)}${row('95% interval', `${sgn0(e.lo)} to ${sgn0(e.hi)}%`)}${row('Significance', pTxt(e.p))}${row('Years', e.years)}`, ev))
+      .on('pointerleave', hideTip);
+    f.g.append('text').attr('class', e.p < 0.05 ? 'ann-strong' : 'ann').attr('x', x(e.hi) + 8).attr('y', cy + 4).text(sgn1(e.pct) + '%');
+  });
+}
+
+/* 03 robustness table */
+function robust(){
+  const L = r => `${COM[r.commodity]}, ${r.season === 'A' ? 'first' : 'second'} season`;
+  const rows = D.robustness.map(r => `<tr><td class="reg">${L(r)}<small>Retail, ${r.years} years</small></td><td class="r num">${sgn1(r.dry_panel_pct)}%</td><td class="r">${pill(r.clustered_p)}</td><td class="r">${pill(r.permutation_p)}</td><td class="r num">${sgn1(r.dry_leave_one_year_out_max)} to ${sgn1(r.dry_leave_one_year_out_min)}%</td></tr>`);
+  D.wholesale.filter(w => w.rainfall === 'rain_national').forEach(w => rows.push(`<tr class="ref"><td class="reg">Maize, ${w.season === 'A' ? 'first' : 'second'} season<small>Wholesale, ${w.years} · independent check</small></td><td class="r num">${sgn1(w.dry_panel_pct)}%</td><td class="r">${pill(w.clustered_p)}</td><td class="r">${pill(w.permutation_p)}</td><td class="r num">–</td></tr>`));
+  document.querySelector('#t-robust tbody').innerHTML = rows.join('');
+}
+
+/* 04 IOD scatter */
+function iod(){
+  const S = D.iod_scatter, isS = innerWidth < 600;
+  const f = frame('c-iod', isS ? 280 : 340, {t:12, r:16, b:40, l:48});
+  const x = d3.scaleLinear().domain([-0.7, 0.75]).range([0, f.w]);
+  const y = d3.scaleLinear().domain([-45, 45]).range([f.h, 0]);
+  yGrid(f, y, d => d3.format('+d')(d) + '%', 6);
+  f.g.append('g').attr('transform', `translate(0,${f.h})`).call(d3.axisBottom(x).ticks(6).tickFormat(d3.format('+.1f')).tickSize(4))
+    .call(a => a.selectAll('.tick line').attr('stroke', css('--rule'))).call(a => a.selectAll('text').attr('dy','1em'));
+  f.g.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', f.h).attr('stroke', css('--ink-2')).attr('opacity', .5);
+  f.g.append('text').attr('x', f.w).attr('y', f.h + 34).attr('text-anchor','end').style('font-size','12px').text('July–August IOD (°C) →');
+  const lr = (() => { const mx = d3.mean(S, d => d.iod), my = d3.mean(S, d => d.pct);
+    const b = d3.sum(S, d => (d.iod - mx) * (d.pct - my)) / d3.sum(S, d => (d.iod - mx) ** 2); return v => my + b * (v - mx); })();
+  f.g.append('line').attr('x1', x(-0.65)).attr('x2', x(0.7)).attr('y1', y(lr(-0.65))).attr('y2', y(lr(0.7))).attr('stroke', css('--ink-2')).attr('stroke-width', 1.75).attr('stroke-linecap','round');
+  f.g.selectAll('circle.d').data(S).join('circle').attr('class','d').attr('cx', d => x(d.iod)).attr('cy', d => y(d.pct)).attr('r', 6)
+    .attr('fill', d => d.iod >= 0.4 ? css('--wet') : d.iod <= -0.4 ? css('--dry') : css('--muted')).attr('stroke', css('--panel')).attr('stroke-width', 2)
+    .on('pointermove', (ev, d) => showTip(`<div class="t">IOD Jul–Aug ${d.year} → prices Feb–May ${d.year + 1}</div>${row('IOD', sgn1(d.iod) + ' °C')}${row('Maize price', sgn0(d.pct) + '% vs normal')}`, ev))
+    .on('pointerleave', hideTip);
+  S.filter(d => Math.abs(d.pct) > 25 || d.iod > 0.6).forEach(d => f.g.append('text').attr('class','ann').attr('x', x(d.iod) + (d.iod > 0.5 ? -9 : 9)).attr('text-anchor', d.iod > 0.5 ? 'end' : 'start').attr('y', y(d.pct) + 4).text(`${d.year}→${String((d.year + 1) % 100).padStart(2, '0')}`));
+  const I = D.iod.find(r => r.commodity === 'Maize (white)'), Sg = D.iod.find(r => r.commodity === 'Sorghum');
+  const cards = [['Maize', sgn0(I.pct_per_degC) + '%', `Change in next Feb–May maize price per +1 °C of July–August IOD. Permutation ${pTxt(I.permutation_p)}.`],
+                 ['Strong positive year', `${sgn0(100 * (Math.exp(Math.log(1 + I.pct_per_degC / 100) * 0.4) - 1))} to ${sgn0(100 * (Math.exp(Math.log(1 + I.pct_per_degC / 100) * 0.7) - 1))}%`, 'Implied maize price change when the July–August IOD reaches +0.4 to +0.7 °C, as in 2019 and 2023.'],
+                 ['Sorghum', sgn0(Sg.pct_per_degC) + '%', `Per +1 °C. Permutation ${pTxt(Sg.permutation_p)}. Beans show no IOD effect.`]];
+  document.getElementById('iod-cards').innerHTML = cards.map(([t, v, p]) => `<div class="panel"><span class="tag wet"><i></i>${t}</span><div class="big num">${v}</div><p>${p}</p></div>`).join('');
+}
+
+/* 05 Karamoja */
+function karamoja(){
+  const isS = innerWidth < 600, K = D.karamoja;
+  const f = frame('c-kar', isS ? 290 : 340, {t:12, r:16, b:62, l:48});
+  const parse = s => new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, 15);
+  const x = d3.scaleTime().domain([new Date(2018, 8, 1), new Date(2026, 1, 1)]).range([0, f.w]);
+  const y = d3.scaleLinear().domain([-45, 100]).range([f.h, 0]);
+  yGrid(f, y, d => d3.format('+d')(d) + '%', 6);
+  f.g.append('g').attr('transform', `translate(0,${f.h})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat(isS ? "'%y" : '%Y')).tickSize(4))
+    .call(a => a.selectAll('.tick line').attr('stroke', css('--rule')));
+  const line = d3.line().x(d => x(parse(d.d))).y(d => y(d.v)).curve(d3.curveMonotoneX);
+  [['Sorghum', '--kar'], ['Maize (white)', '--wet']].forEach(([k, c]) => f.g.append('path').attr('d', line(K.series[k])).attr('fill','none').attr('stroke', css(c)).attr('stroke-width', 2.2).attr('stroke-linejoin','round'));
+  Object.entries(K.rain).forEach(([yr, z]) => {
+    const cx = x(new Date(+yr, 6, 1));
+    if (cx < 0 || cx > f.w) return;
+    f.g.append('text').attr('x', cx).attr('y', f.h + 34).attr('text-anchor','middle').style('font-family','var(--f-mono)').style('font-size','10.5px')
+      .style('fill', z <= -0.5 ? css('--dry') : z >= 0.5 ? css('--wet') : css('--muted')).text(sgn1(z));
+  });
+  f.g.append('text').attr('x', 0).attr('y', f.h + 52).style('font-size','11px').text('April–September rainfall, standard deviations from normal');
+  const pk = K.series['Maize (white)'].reduce((a, b) => b.v > a.v ? b : a);
+  f.g.append('text').attr('class','ann-strong').attr('x', x(parse(pk.d)) + 8).attr('y', y(pk.v) + 4).text(`${sgn0(pk.v)}% · mid-2022`);
+  const cross = f.g.append('line').attr('y1', 0).attr('y2', f.h).attr('stroke', css('--ink-2')).attr('opacity', 0);
+  f.g.append('rect').attr('width', f.w).attr('height', f.h).attr('fill','transparent')
+    .on('pointermove', ev => { const t = x.invert(d3.pointer(ev)[0]); const key = d3.timeFormat('%Y-%m')(t);
+      const m = K.series['Maize (white)'].find(d => d.d === key), s = K.series['Sorghum'].find(d => d.d === key);
+      if (!m && !s) return; cross.attr('x1', x(parse(key))).attr('x2', x(parse(key))).attr('opacity', .45);
+      showTip(`<div class="t">${d3.timeFormat('%b %Y')(parse(key))}</div>${s ? row('Sorghum', sgn0(s.v) + '%', css('--kar')) : ''}${m ? row('Maize', sgn0(m.v) + '%', css('--wet')) : ''}`, ev); })
+    .on('pointerleave', () => { hideTip(); cross.attr('opacity', 0); });
+
+  const I = K.integration, coms = ['Maize (white)', 'Sorghum', 'Beans'];
+  const g = frame('c-integ', 44 * coms.length + 36, {t:6, r:44, b:28, l: isS ? 80 : 100});
+  const yb = d3.scaleBand().domain(coms).range([0, g.h]).padding(.22);
+  const yy = d3.scaleBand().domain(['c', 'k']).range([0, yb.bandwidth()]).padding(.1);
+  const xb = d3.scaleLinear().domain([0, 0.8]).range([0, g.w]);
+  g.g.append('g').attr('transform', `translate(0,${g.h})`).call(d3.axisBottom(xb).ticks(4).tickSize(-g.h).tickFormat(d3.format('.1f')))
+    .call(a => a.selectAll('.tick line').attr('stroke', css('--grid'))).call(a => a.selectAll('.tick text').attr('dy','1.1em'));
+  coms.forEach(c => {
+    g.g.append('text').attr('x', -10).attr('y', yb(c) + yb.bandwidth()/2 + 4).attr('text-anchor','end').attr('class','lab').style('fill', css('--ink')).text(COM[c]);
+    [['c', I[c]['co-movement core-core'], '--wet', 'Core with core'], ['k', I[c]['co-movement Karamoja-core'], '--kar', 'Karamoja with core']].forEach(([k, v, col, n]) => {
+      const w = xb(v), y0 = yb(c) + yy(k), h = yy.bandwidth();
+      g.g.append('path').attr('d', `M0,${y0} h${w-3} a3,3 0 0 1 3,3 v${h-6} a3,3 0 0 1 -3,3 h${-(w-3)} Z`).attr('fill', css(col))
+        .on('pointermove', ev => showTip(`<div class="t">${COM[c]}</div>${row(n, fmt2(v), css(col))}`, ev)).on('pointerleave', hideTip);
+      g.g.append('text').attr('class','ann').attr('x', w + 6).attr('y', y0 + h/2 + 4).text(fmt2(v));
+    });
+  });
+}
+
+/* 06 FAOSTAT */
+function fao(){
+  const host = document.getElementById('c-fao'); host.innerHTML = '';
+  const F = D.faostat, names = {'Maize (corn)': 'Maize', 'Beans, dry': 'Beans', 'Sorghum': 'Sorghum', 'Cassava, fresh': 'Cassava', 'Plantains and cooking bananas': 'Cooking bananas'};
+  Object.entries(F.area).forEach(([c, s]) => {
+    const p = document.createElement('div'); p.className = 'panel';
+    p.innerHTML = `<div class="ph"><b>${names[c]}</b><span class="panel-sub">Area harvested, 000 ha</span></div><div class="chart"></div>`;
+    host.appendChild(p);
+    const f = frame(p.querySelector('.chart'), 160, {t:10, r:8, b:22, l:42});
+    const x = d3.scaleLinear().domain([1990, 2024]).range([0, f.w]);
+    const y = d3.scaleLinear().domain([0, d3.max(s, d => d.v) * 1.08]).nice(4).range([f.h, 0]);
+    f.g.append('rect').attr('x', x(2012.5)).attr('width', x(2015.5) - x(2012.5)).attr('y', 0).attr('height', f.h).attr('fill', css('--band'));
+    yGrid(f, y, d3.format(',d'), 4);
+    f.g.append('line').attr('x1', x(2008)).attr('x2', x(2008)).attr('y1', 0).attr('y2', f.h).attr('stroke', css('--dry')).attr('stroke-dasharray', '3 3');
+    f.g.append('g').attr('transform', `translate(0,${f.h})`).call(d3.axisBottom(x).tickValues([1990, 2008, 2024]).tickFormat(d3.format('d')).tickSize(0)).call(a => a.selectAll('text').attr('dy','1.2em'));
+    f.g.append('path').attr('d', d3.line().x(d => x(d.y)).y(d => y(d.v))(s)).attr('fill','none').attr('stroke', css('--wet')).attr('stroke-width', 2);
+    f.g.selectAll('circle').data(s).join('circle').attr('cx', d => x(d.y)).attr('cy', d => y(d.v)).attr('r', 2.2).attr('fill', css('--wet'))
+      .on('pointermove', (ev, d) => showTip(`<div class="t">${names[c]} · ${d.y}</div>${row('Area harvested', d3.format(',.0f')(d.v) + ' 000 ha')}`, ev)).on('pointerleave', hideTip);
+  });
+  const crops = ['Maize (corn)', 'Beans, dry', 'Sorghum', 'Millet', 'Cassava, fresh', 'Sweet potatoes'];
+  document.querySelector('#t-fao tbody').innerHTML = crops.map(c => { const r = F.rain_response[c];
+    return `<tr><td class="reg">${c.split(',')[0].split(' (')[0]}</td><td class="r num">${sgn0(F.change_2008[c])}%</td><td class="r"><span class="num">${fmt2(r.r)}</span> ${pill(r.p)}</td></tr>`; }).join('');
+}
+
+function drawAll(){ cycle(); effects(); iod(); karamoja(); fao(); }
+fill(); robust(); drawAll();
+let raf; const redraw = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(drawAll); };
+let lastW = innerWidth; addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; redraw(); } });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+new MutationObserver(redraw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>
+
+</body></html>

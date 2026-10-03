@@ -1,0 +1,4 @@
+season,rainfall,years,panel_pct,clustered_p,yearly_pct,permutation_p,dry_panel_pct
+A,rain_national,2006–2021,-9.5993,0.0003,-10.4541,0.0315,10.6186
+A,rain_regional,2006–2021,-9.8715,0.0018,-11.7631,0.0395,10.9527
+B,rain_national,2006–2021,-4.0686,0.3352,-3.8101,0.5322,4.2412

@@ -1,5 +1,5 @@
-commodity,season,rainfall,panel_pct,clustered_p,yearly_pct,permutation_p,years,leave_one_year_out_min,leave_one_year_out_max
-Maize (white),A,rain_national,-8.4017,0.0016,-7.9525,0.0765,15,-10.262,-7.0985
-Maize (white),B,rain_national,-7.5529,0.0926,-7.1903,0.1609,16,-10.8945,-4.3489
-Sorghum,B,rain_regional,-8.3399,0.0009,-6.5127,0.1269,16,-10.0085,-7.1826
-Maize flour,A,rain_national,-5.1667,0.0199,-5.0211,0.1814,16,-6.9872,-3.8668
+commodity,season,rainfall,panel_pct,clustered_p,yearly_pct,permutation_p,years,leave_one_year_out_min,leave_one_year_out_max,dry_panel_pct,dry_yearly_pct,dry_leave_one_year_out_min,dry_leave_one_year_out_max
+Maize (white),A,rain_national,-8.3409,0.0019,-7.8946,0.076,15,-10.2428,-7.0316,9.0999,8.5712,11.4117,7.5635
+Maize (white),B,rain_national,-6.5029,0.0918,-6.5503,0.1464,16,-9.3359,-3.8071,6.9552,7.0095,10.2973,3.9578
+Sorghum,B,rain_regional,-8.4457,0.0007,-6.5434,0.1134,16,-10.1031,-7.3553,9.2247,7.0015,11.2385,7.9393
+Maize flour,A,rain_national,-5.1667,0.0199,-5.0211,0.1814,16,-6.9872,-3.8668,5.4482,5.2866,7.5121,4.0224
