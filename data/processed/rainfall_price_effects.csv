@@ -1,0 +1,33 @@
+commodity,season,rainfall,controls,coef,se,p,n,years,markets,pct
+Maize (white),A,rain_regional,world,-0.0814,0.0279,0.0035,92,15,7,-7.8199
+Maize (white),A,rain_regional,world + fx,-0.0818,0.0309,0.0081,92,15,7,-7.8575
+Maize (white),A,rain_national,world,-0.0878,0.0278,0.0016,92,15,7,-8.4017
+Maize (white),A,rain_national,world + fx,-0.0869,0.0295,0.0032,92,15,7,-8.3254
+Maize (white),B,rain_regional,world,-0.0734,0.0427,0.0857,95,16,7,-7.0775
+Maize (white),B,rain_regional,world + fx,-0.0748,0.0442,0.0905,95,16,7,-7.2038
+Maize (white),B,rain_national,world,-0.0785,0.0467,0.0926,95,16,7,-7.5529
+Maize (white),B,rain_national,world + fx,-0.0803,0.0485,0.0978,95,16,7,-7.7183
+Maize flour,A,rain_regional,world,-0.0509,0.0219,0.0201,99,16,7,-4.9654
+Maize flour,A,rain_regional,world + fx,-0.0491,0.0255,0.0539,99,16,7,-4.7892
+Maize flour,A,rain_national,world,-0.053,0.0228,0.0199,99,16,7,-5.1667
+Maize flour,A,rain_national,world + fx,-0.0503,0.0253,0.0471,99,16,7,-4.9017
+Maize flour,B,rain_regional,world,-0.0451,0.0337,0.1807,106,17,7,-4.4083
+Maize flour,B,rain_regional,world + fx,-0.0448,0.0337,0.1844,106,17,7,-4.3795
+Maize flour,B,rain_national,world,-0.04,0.0351,0.2537,106,17,7,-3.924
+Maize flour,B,rain_national,world + fx,-0.0396,0.0351,0.2601,106,17,7,-3.8793
+Sorghum,A,rain_regional,world,-0.0382,0.0265,0.1491,92,15,7,-3.7446
+Sorghum,A,rain_regional,world + fx,-0.0386,0.0288,0.1812,92,15,7,-3.7827
+Sorghum,A,rain_national,world,-0.0457,0.025,0.0676,92,15,7,-4.4711
+Sorghum,A,rain_national,world + fx,-0.0452,0.0279,0.1057,92,15,7,-4.4165
+Sorghum,B,rain_regional,world,-0.0871,0.0261,0.0009,94,16,7,-8.3399
+Sorghum,B,rain_regional,world + fx,-0.085,0.0266,0.0014,94,16,7,-8.1509
+Sorghum,B,rain_national,world,-0.0802,0.0289,0.0056,94,16,7,-7.7052
+Sorghum,B,rain_national,world + fx,-0.0777,0.0298,0.0092,94,16,7,-7.4789
+Beans,A,rain_regional,world,-0.0298,0.0245,0.2234,96,18,7,-2.9343
+Beans,A,rain_regional,world + fx,-0.0312,0.0244,0.2011,96,18,7,-3.0733
+Beans,A,rain_national,world,-0.0349,0.0199,0.0799,96,18,7,-3.4302
+Beans,A,rain_national,world + fx,-0.036,0.0201,0.0726,96,18,7,-3.5377
+Beans,B,rain_regional,world,0.028,0.0234,0.2312,101,18,7,2.8446
+Beans,B,rain_regional,world + fx,0.0284,0.0232,0.2202,101,18,7,2.8838
+Beans,B,rain_national,world,0.0374,0.0224,0.0941,101,18,7,3.8137
+Beans,B,rain_national,world + fx,0.0378,0.0221,0.0871,101,18,7,3.855
