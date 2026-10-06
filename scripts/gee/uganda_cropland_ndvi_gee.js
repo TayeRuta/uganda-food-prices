@@ -6,7 +6,13 @@
  * and press Run. Check the printed numbers, then start the export from the
  * Tasks tab. The export runs on Google's servers and can take 30–90 minutes.
  *
- * Output: uganda_vegetation_by_region_monthly.csv, one row per region,
+ * SENSOR picks the satellite: 'terra' (MOD13Q1, morning pass, from Feb 2000)
+ * or 'aqua' (MYD13Q1, afternoon pass, from Jul 2002). Running both lets you
+ * check whether a change in the record is real or an artefact of one sensor
+ * (Terra's orbit has drifted since 2020).
+ *
+ * Output: uganda_vegetation_by_region_monthly.csv (Terra) or
+ *   uganda_vegetation_by_region_monthly_aqua.csv (Aqua), one row per region,
  *   land-cover class and month:
  *     region, group, cover, date, year, month, ndvi, evi, good_frac, cover_km2
  *   ndvi, evi   average over 250 m pixels of that cover class (good-quality
@@ -21,12 +27,16 @@
  **************************************************************************/
 
 // ---------------------------------------------------------------- settings
-var START = '2000-02-01';       // first MODIS composite is 18 Feb 2000
+var SENSOR = 'terra';           // 'terra' or 'aqua'
+var SENSORS = {
+  terra: {collection: 'MODIS/061/MOD13Q1', start: '2000-02-01', suffix: ''},
+  aqua:  {collection: 'MODIS/061/MYD13Q1', start: '2002-07-01', suffix: '_aqua'}
+};
+var START = SENSORS[SENSOR].start;
 // Stop a month short of today, so the last month isn't half-filled while MODIS
 // composites are still being processed (they appear 2–4 weeks after collection)
 var END   = ee.Date(Date.now()).advance(-1, 'month');
-// If the export fails with a memory or time error, raise TILE_SCALE to 8 or 16,
-// or split the period (e.g. START '2000-02-01' / END '2013-01-01', then the rest).
+// If the export fails with a memory or time error, raise TILE_SCALE to 8 or 16.
 var TILE_SCALE = 4;
 
 // Land-cover classes from ESA WorldCover 2021 (10 m):
@@ -80,7 +90,8 @@ var regions = ee.FeatureCollection([national, karamoja, lakeVictoria]).merge(adm
 print('Regions (expect 7):', regions.aggregate_array('region'));
 
 // ---------------------------------------------------------------- vegetation
-var modis = ee.ImageCollection('MODIS/061/MOD13Q1').filterDate(START, END);
+var modis = ee.ImageCollection(SENSORS[SENSOR].collection).filterDate(START, END);
+print('Sensor:', SENSOR, SENSORS[SENSOR].collection);
 var proj = modis.first().select('NDVI').projection();
 
 var SCALE = proj.nominalScale();   // about 232 m
@@ -164,8 +175,8 @@ Map.addLayer(regions.style({color: '333333', fillColor: '00000000', width: 1}), 
 // ---------------------------------------------------------------- export
 Export.table.toDrive({
   collection: table,
-  description: 'uganda_vegetation_by_region_monthly',
-  fileNamePrefix: 'uganda_vegetation_by_region_monthly',
+  description: 'uganda_vegetation_by_region_monthly' + SENSORS[SENSOR].suffix,
+  fileNamePrefix: 'uganda_vegetation_by_region_monthly' + SENSORS[SENSOR].suffix,
   fileFormat: 'CSV',
   selectors: ['region', 'group', 'cover', 'date', 'year', 'month', 'ndvi', 'evi', 'good_frac', 'cover_km2']
 });
