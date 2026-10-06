@@ -170,3 +170,33 @@ def fit(panel, x, controls=('world',), cluster='year'):
     return {'coef': m.params[x], 'se': m.bse[x], 'p': m.pvalues[x], 'n': int(m.nobs),
             'years': int(q['year'].nunique()), 'markets': int(q['market'].nunique()),
             'pct': 100 * (np.exp(m.params[x]) - 1)}
+
+
+# ---------------------------------------------------------------- vegetation (MODIS)
+VEG_FILES = {'terra': 'uganda_vegetation_by_region_monthly.csv', 'aqua': 'uganda_vegetation_by_region_monthly_aqua.csv'}
+
+
+def load_vegetation(sensor='terra'):
+    """Monthly MODIS NDVI/EVI by region and cover class, from scripts/gee/uganda_cropland_ndvi_gee.js."""
+    return pd.read_csv(RAW / VEG_FILES[sensor])
+
+
+def season_greenness(var='ndvi', cover='cropland', months=(5, 6, 7), sensor='terra', years=range(2001, 2026)):
+    """Seasonal mean of a vegetation index per region and year, standardised over `years`.
+    Months below the first listed month belong to the following calendar year, so (11, 12, 1)
+    means November–December of year y and January of y + 1."""
+    v = load_vegetation(sensor)
+    w = v[v['cover'] == cover].pivot_table(index=['year', 'month'], columns='region', values=var)
+    first = months[0]
+    rows = {}
+    for y in years:
+        idx = [(y if m >= first else y + 1, m) for m in months]
+        if all(i in w.index for i in idx):
+            rows[y] = w.loc[idx].mean()
+    s = pd.DataFrame(rows).T
+    return (s - s.mean()) / s.std()
+
+
+def monthly_anomaly(df):
+    """Standardise a (year, month)-indexed frame against each calendar month's own mean and spread."""
+    return df.groupby(level=1).transform(lambda x: (x - x.mean()) / x.std())

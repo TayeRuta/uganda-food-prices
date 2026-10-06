@@ -90,6 +90,22 @@ def faostat():
             'change_2008': {c: r4(v) for c, v in change08.items()}, 'rain_response': resp}
 
 
+def greenness():
+    seasonal = pd.read_csv(OUT / 'national_greenness_by_season.csv', index_col=0)
+    resid = pd.read_csv(OUT / 'greenness_unexplained_by_rain.csv', header=[0, 1], index_col=0)
+    rs = pd.read_csv(OUT / 'greenness_rain_seasonal.csv', header=[0, 1], index_col=0)
+    gp = pd.read_csv(OUT / 'greenness_price_effects.csv')
+    kar = pd.read_csv(OUT / 'karamoja_greenness_2018_2025.csv', index_col=0)
+    return {
+        'seasonal': [{'year': int(y), 'A': r4(r['first_season']), 'B': r4(r['second_season'])} for y, r in seasonal.iterrows()],
+        'resid': {f'{a}|{b}': [{'year': int(y), 'v': r4(v)} for y, v in resid[(a, b)].items()] for a, b in resid.columns},
+        'rain_link': {r: {'A': r4(rs.loc[r, ('r', 'Mar–May rain → May–Jul greenness')]),
+                          'B': r4(rs.loc[r, ('r', 'Oct–Dec rain → Nov–Jan greenness')])} for r in rs.index},
+        'price': gp.round(4).to_dict('records'),
+        'karamoja': {int(y): {k: r4(v) for k, v in row.items()} for y, row in kar.iterrows()},
+    }
+
+
 def main():
     data = {
         'profiles': profiles(),
@@ -100,6 +116,7 @@ def main():
         'iod_scatter': iod_scatter(),
         'karamoja': karamoja(),
         'faostat': faostat(),
+        'greenness': greenness(),
     }
     (OUT / 'report_data.json').write_text(json.dumps(data, indent=1))
     s = REPORT.read_text()
