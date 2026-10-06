@@ -2,16 +2,16 @@
 <title>Uganda Food Prices and Rainfall</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <style>
 /* Layout: single 1080px report column — masthead, KPI strip, then numbered findings, each = headline + chart panel + takeaway */
 :root{
   --bg:#f3f5f1; --panel:#ffffff; --ink:#132019; --ink-2:#4b5a51; --muted:#7a877f; --rule:#dfe4dd; --grid:#eceee9;
   --accent:#16825a; --wet:#2b6c9e; --wet-deep:#1b4a70; --dry:#c4572e; --dry-deep:#8d3416; --neutral:#ecebe6;
   --mam:#16825a; --son:#8a63d2; --band:#eef3ec; --chip:#e8eee6;
-  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --f-body:"Public Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-display:"Noto Sans JP",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Noto Sans JP",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Noto Sans JP",ui-sans-serif,system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f1411; --panel:#161d19; --ink:#eaf0eb; --ink-2:#b2beb6; --muted:#859189; --rule:#27302b; --grid:#1f2723;
@@ -153,6 +153,55 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);font-si
 .callout p{font-size:14.5px;color:var(--ink-2)}
 @media (max-width:820px){.callout{grid-template-columns:1fr}}
 .mapnote{font-size:13px;color:var(--muted)}
+</style>
+<style id="formatting">
+/* Formatting: ink, white and grey with one vermilion origin line. Chart data colours are defined separately and unchanged. */
+:root{
+  --bg:#ffffff; --panel:#f6f5f2; --ink:#1a1a1a; --ink-2:#4a4a4a; --muted:#6b6b6b; --rule:#e6e4df; --grid:#ecebe7;
+  --accent:#1a1a1a; --band:#efeeea; --chip:#e6e4df; --origin:#d13b1f;
+  --f-display:"Noto Sans JP",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Noto Sans JP",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"Noto Sans JP",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a1a1a; --panel:#222221; --ink:#ffffff; --ink-2:#c9c8c4; --muted:#a3a29e; --rule:#34332f; --grid:#2b2a28;
+  --accent:#ffffff; --band:#262624; --chip:#2e2d2a; --origin:#ff7a5c}}
+:root[data-theme="dark"]{
+  --bg:#1a1a1a; --panel:#222221; --ink:#ffffff; --ink-2:#c9c8c4; --muted:#a3a29e; --rule:#34332f; --grid:#2b2a28;
+  --accent:#ffffff; --band:#262624; --chip:#2e2d2a; --origin:#ff7a5c}
+body{font-weight:400;font-feature-settings:"tnum" 1}
+.num,svg .tick text,.kpi .v,.big{font-variant-numeric:tabular-nums}
+/* Headings: Light, sentence case, ink */
+h1,h2,h3{letter-spacing:-.01em}
+.mast h1{font-weight:300;line-height:1.12;max-width:18ch}
+.mast h1 em{font-style:normal;color:var(--ink);font-weight:500}
+.f-head h2{font-weight:300}
+.limits h3,.who h3{font-weight:500}
+.panel-title,.summary b,.zone h3{font-weight:500}
+.kpi .v,.callout .big{font-weight:300}
+/* Labels: Medium, uppercase, tracked, grey */
+.eyebrow{color:var(--muted);font-weight:500;letter-spacing:.14em;font-size:11.5px}
+.eyebrow span+span{color:var(--muted)}
+.f-num,.summary h2,.note .k,th{color:var(--muted);font-weight:500;letter-spacing:.12em}
+.summary li::before{color:var(--muted);font-weight:500}
+/* The origin line: one per page, under the title, starting at the margin and running to the edge */
+.mast{position:relative;padding-top:64px;border-bottom:1px solid var(--rule)}
+.mast::before{content:"";position:absolute;top:30px;left:0;right:-100vw;height:3px;background:var(--origin)}
+body{overflow-x:hidden}
+.kpis{border-top:1px solid var(--ink)}
+/* Accents that were green become ink */
+.pill.sig{background:var(--ink);color:var(--bg)}
+.pill.border{border-color:var(--muted)}
+.conf.high{background:var(--ink);color:var(--bg)}
+.conf.med{border-color:var(--ink);color:var(--ink)}
+.next{border-left-color:var(--ink)}
+nav.toc a{background:var(--bg)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--ink)}
+a{color:var(--ink)!important;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+nav.toc a{text-decoration:none}
+summary:focus-visible,.tabs button:focus-visible{outline-color:var(--ink)}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.panel{border-color:var(--rule)}
 </style>
 <div id="tip" role="status" aria-live="polite"></div>
 <style>
