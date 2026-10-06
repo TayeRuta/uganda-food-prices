@@ -186,8 +186,9 @@ h1,h2,h3{letter-spacing:-.01em}
 .summary li::before{color:var(--muted);font-weight:500}
 /* The origin line: one per page, under the title, starting at the margin and running to the edge */
 .mast{position:relative;padding-top:64px;border-bottom:1px solid var(--rule)}
-.mast::before{content:"";position:absolute;top:30px;left:0;right:-100vw;height:3px;background:var(--origin)}
-body{overflow-x:hidden}
+/* Runs from the text margin to the right edge of the window, without widening the page */
+.mast::before{content:"";position:absolute;top:30px;left:0;right:calc((100% - 100vw) / 2);height:3px;background:var(--origin)}
+html{overflow-x:clip}
 .kpis{border-top:1px solid var(--ink)}
 /* Accents that were green become ink */
 .pill.sig{background:var(--ink);color:var(--bg)}
