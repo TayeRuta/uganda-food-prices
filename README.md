@@ -109,6 +109,7 @@ Each dataset keeps its provider's terms of use; check them before reusing the ra
 - [Uganda rainfall analysis](https://github.com/TayeRuta/uganda-rainfall-analysis): national, regional and Indian Ocean Dipole analysis of Uganda's rainfall
 - [Uganda coffee](https://github.com/TayeRuta/uganda-coffee): exports, prices, climate exposure and a global benchmark
 - [Uganda irrigation](https://github.com/TayeRuta/uganda-irrigation): where irrigation is needed and where water is within reach
+- [Uganda food trade](https://github.com/TayeRuta/uganda-food-trade): staple food trade with neighbouring countries, source gaps and price links
 
 ## License
 
