@@ -1,5 +1,7 @@
 # Rainfall Shocks and Food Prices in Uganda
 
+> Part of a series on Uganda's agriculture. **[Read the synthesis of all five analyses →](https://tayeruta.github.io/uganda-agriculture/)**
+
 How Uganda's rainy seasons, and the Indian Ocean conditions that drive them, show up in the prices of maize, sorghum and beans. The project links WFP market prices (2006–2026) to regional rainfall from the companion [Uganda rainfall analysis](https://github.com/TayeRuta/uganda-rainfall-analysis). It also audits whether FAOSTAT's national crop statistics can support this kind of analysis.
 
 **Read the report: [Rainfall shocks and food prices in Uganda](https://tayeruta.github.io/uganda-food-prices/reports/food_prices_report.html)**
