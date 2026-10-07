@@ -104,6 +104,12 @@ Each dataset keeps its provider's terms of use; check them before reusing the ra
 - **Cropland map:** ESA WorldCover 2021 records about 27,000 km² of cropland, well below Uganda's cultivated area; the banana–coffee belt of Central and Western is under-counted, so greenness there covers fewer fields.
 - **Short Karamoja record:** Karamoja prices start in late 2018, too few seasons to estimate rainfall effects there.
 
+## Related projects
+
+- [Uganda rainfall analysis](https://github.com/TayeRuta/uganda-rainfall-analysis): national, regional and Indian Ocean Dipole analysis of Uganda's rainfall
+- [Uganda coffee](https://github.com/TayeRuta/uganda-coffee): exports, prices, climate exposure and a global benchmark
+- [Uganda irrigation](https://github.com/TayeRuta/uganda-irrigation): where irrigation is needed and where water is within reach
+
 ## License
 
 Code and analysis: [MIT](LICENSE).
